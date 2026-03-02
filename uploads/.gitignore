@@ -1,0 +1,6 @@
+# Ignore uploaded files, keep directory structure
+full/*
+thumbs/*
+!.gitignore
+!full/.gitkeep
+!thumbs/.gitkeep
