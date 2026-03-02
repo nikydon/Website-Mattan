@@ -3,9 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
-const routes = require('./routes/index');
-const uploadRoutes = require('./routes/upload');
-const adminRoutes = require('./routes/admin/index');
+const { ensureSeeded } = require('./lib/ensureSeed');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -31,19 +29,39 @@ app.use(session({
 }));
 
 // Routes
-app.use('/', routes);
-app.use('/upload', uploadRoutes);
-app.use('/admin', adminRoutes);
+app.use('/', require('./routes/index'));
+app.use('/upload', require('./routes/upload'));
+app.use('/admin', require('./routes/admin/index'));
 
 // 404 catch-all
 app.use(async (req, res) => {
   const { loadSettings, getDefaultTenant } = require('./lib/settings');
-  const tenant = await getDefaultTenant();
-  const settings = tenant ? await loadSettings(tenant.id) : {};
-  res.status(404).render('404', { settings });
+  try {
+    const tenant = await getDefaultTenant();
+    const settings = tenant ? await loadSettings(tenant.id) : {};
+    res.status(404).render('404', { settings });
+  } catch {
+    res.status(404).send('Not found');
+  }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`[${new Date().toISOString()}] Server started on port ${PORT}`);
+// Global error handler
+app.use((err, _req, res, _next) => {
+  console.error('[error]', err.stack || err);
+  res.status(500).send('Internal server error');
 });
+
+// Start: seed if empty, then listen
+async function start() {
+  try {
+    await ensureSeeded();
+  } catch (err) {
+    console.error('[seed] Warning — could not auto-seed:', err.message);
+  }
+
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`[${new Date().toISOString()}] Server started on 0.0.0.0:${PORT}`);
+  });
+}
+
+start();
