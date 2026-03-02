@@ -1,0 +1,41 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<main>
+  <section class="section piece-detail">
+    <div class="piece-layout">
+      <div class="piece-gallery">
+        <% if (item.images.length) { %>
+          <% item.images.forEach((img, i) => { %>
+          <img
+            src="/uploads/full/<%= img.filename %>"
+            alt="<%= img.altText || item.title %>"
+            class="piece-image<%= i === 0 ? ' piece-image--main' : '' %>"
+            loading="<%= i === 0 ? 'eager' : 'lazy' %>"
+          >
+          <% }) %>
+        <% } else { %>
+          <div class="piece-image piece-image--empty"></div>
+        <% } %>
+      </div>
+
+      <div class="piece-info">
+        <% if (item.collection) { %>
+          <a href="/collections/<%= item.collection.slug %>" class="piece-breadcrumb"><%= item.collection.name %></a>
+        <% } %>
+        <h1 class="piece-title"><%= item.title %></h1>
+        <% if (item.price) { %>
+          <p class="piece-price"><%= item.price %></p>
+        <% } %>
+        <% if (item.description) { %>
+          <p class="piece-desc"><%= item.description %></p>
+        <% } %>
+        <% if (item.materials) { %>
+          <p class="piece-materials"><span>Materials:</span> <%= item.materials %></p>
+        <% } %>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,33 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<main>
+  <section class="section">
+    <h1 class="page-title"><%= collection.name %></h1>
+    <% if (collection.description) { %>
+      <p class="page-subtitle"><%= collection.description %></p>
+    <% } %>
+
+    <% if (collection.catalogItems.length) { %>
+    <div class="grid grid-3">
+      <% collection.catalogItems.forEach(item => { %>
+      <a href="/pieces/<%= item.slug %>" class="card">
+        <% if (item.images.length) { %>
+          <div class="card-img" style="background-image: url('/uploads/thumbs/<%= item.images[0].filename.replace(/\.\w+$/, '.webp') %>')"></div>
+        <% } else { %>
+          <div class="card-img card-img--empty"></div>
+        <% } %>
+        <h3 class="card-title"><%= item.title %></h3>
+        <% if (item.price) { %>
+          <p class="card-price"><%= item.price %></p>
+        <% } %>
+      </a>
+      <% }) %>
+    </div>
+    <% } else { %>
+    <p class="empty-state">No pieces in this collection yet.</p>
+    <% } %>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

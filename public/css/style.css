@@ -1,18 +1,461 @@
-/* Base reset */
+/* ─── Reset ─────────────────────────────────────────── */
 *, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* ─── Variables ─────────────────────────────────────── */
+:root {
+  --color-bg: #faf9f7;
+  --color-text: #1a1a1a;
+  --color-muted: #6b6b6b;
+  --color-border: #e0ddd8;
+  --color-accent: #1a1a1a;
+  --color-card-bg: #f2f0ec;
+  --font-body: 'Georgia', 'Times New Roman', serif;
+  --font-heading: 'Georgia', 'Times New Roman', serif;
+  --max-width: 1200px;
+  --gap: 2rem;
+}
+
+/* ─── Base ──────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: Georgia, 'Times New Roman', serif;
-  color: #111;
-  background: #fff;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.7;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ─── Header / Nav ──────────────────────────────────── */
+.site-header {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.nav {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 1.5rem var(--gap);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .brand-name {
   font-size: 1.25rem;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.35em;
   text-transform: uppercase;
+  font-weight: normal;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 2.5rem;
+}
+
+.nav-links a {
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  transition: color 0.2s;
+}
+
+.nav-links a:hover {
+  color: var(--color-text);
+}
+
+/* ─── Hero ──────────────────────────────────────────── */
+.hero {
+  text-align: center;
+  padding: 8rem var(--gap) 6rem;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: normal;
+  letter-spacing: 0.4em;
+  margin-bottom: 1rem;
+}
+
+.hero-tagline {
+  font-size: 1.05rem;
+  color: var(--color-muted);
+  font-style: italic;
+  margin-bottom: 2.5rem;
+}
+
+.hero-cta {
+  display: inline-block;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border: 1px solid var(--color-text);
+  padding: 0.75rem 2rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.hero-cta:hover {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+/* ─── Sections ──────────────────────────────────────── */
+.section {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 4rem var(--gap);
+}
+
+.section-title {
+  font-size: 0.85rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  font-weight: normal;
+  text-align: center;
+  margin-bottom: 3rem;
+  color: var(--color-muted);
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: normal;
+  letter-spacing: 0.15em;
+  margin-bottom: 1rem;
+}
+
+.page-subtitle {
+  color: var(--color-muted);
+  margin-bottom: 3rem;
+  max-width: 600px;
+}
+
+.empty-state {
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+/* ─── Grid ──────────────────────────────────────────── */
+.grid {
+  display: grid;
+  gap: var(--gap);
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* ─── Cards ─────────────────────────────────────────── */
+.card {
+  display: block;
+  transition: opacity 0.2s;
+}
+
+.card:hover {
+  opacity: 0.8;
+}
+
+.card-img {
+  aspect-ratio: 3 / 4;
+  background-color: var(--color-card-bg);
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 1rem;
+}
+
+.card-img--empty {
+  background: var(--color-card-bg);
+}
+
+.card-title {
+  font-size: 0.95rem;
+  font-weight: normal;
+  letter-spacing: 0.08em;
+}
+
+.card-desc {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  margin-top: 0.25rem;
+}
+
+.card-count {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  margin-top: 0.25rem;
+}
+
+.card-price {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  margin-top: 0.25rem;
+}
+
+/* ─── Piece Detail ──────────────────────────────────── */
+.piece-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+.piece-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.piece-image {
+  width: 100%;
+  background: var(--color-card-bg);
+}
+
+.piece-image--empty {
+  aspect-ratio: 3 / 4;
+  background: var(--color-card-bg);
+}
+
+.piece-breadcrumb {
+  display: inline-block;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 1rem;
+  transition: color 0.2s;
+}
+
+.piece-breadcrumb:hover {
+  color: var(--color-text);
+}
+
+.piece-title {
+  font-size: 1.75rem;
+  font-weight: normal;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+}
+
+.piece-price {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.piece-desc {
+  color: var(--color-muted);
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+}
+
+.piece-materials {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.piece-materials span {
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+/* ─── About ─────────────────────────────────────────── */
+.about-page .page-title {
+  margin-bottom: 3rem;
+}
+
+.about-block {
+  max-width: 640px;
+  margin-bottom: 3rem;
+}
+
+.about-block p {
+  line-height: 1.9;
+  color: var(--color-muted);
+}
+
+.about-heading {
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: normal;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+}
+
+/* ─── News ──────────────────────────────────────────── */
+.news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  max-width: 640px;
+}
+
+.news-card {
+  display: block;
+  padding-bottom: 3rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.news-date {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  letter-spacing: 0.05em;
+}
+
+.news-title {
+  font-size: 1.25rem;
+  font-weight: normal;
+  margin: 0.5rem 0;
+}
+
+.news-excerpt {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  line-height: 1.7;
+}
+
+.news-article .page-title {
+  margin-bottom: 0.5rem;
+}
+
+.news-article .news-date {
+  display: block;
+  margin-bottom: 2.5rem;
+}
+
+.news-body {
+  max-width: 640px;
+}
+
+.news-body p {
+  margin-bottom: 1.25rem;
+  line-height: 1.9;
+  color: var(--color-muted);
+}
+
+.news-images {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 640px;
+}
+
+.news-image {
+  width: 100%;
+}
+
+/* ─── 404 ───────────────────────────────────────────── */
+.not-found {
+  text-align: center;
+  padding: 8rem var(--gap);
+}
+
+.not-found .page-title {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.not-found p {
+  color: var(--color-muted);
+  margin-bottom: 2rem;
+}
+
+/* ─── Footer ────────────────────────────────────────── */
+.site-footer {
+  border-top: 1px solid var(--color-border);
+  margin-top: 4rem;
+}
+
+.footer-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 3rem var(--gap);
+  text-align: center;
+}
+
+.footer-tagline {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  font-style: italic;
+  margin-top: 0.75rem;
+}
+
+.footer-contact {
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.footer-contact a {
+  color: var(--color-muted);
+  transition: color 0.2s;
+}
+
+.footer-contact a:hover {
+  color: var(--color-text);
+}
+
+/* ─── Responsive ────────────────────────────────────── */
+@media (max-width: 900px) {
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .piece-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .hero-title {
+    font-size: 2.25rem;
+  }
+}
+
+@media (max-width: 550px) {
+  .nav {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .nav-links {
+    gap: 1.5rem;
+  }
+
+  .grid-4,
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding: 5rem var(--gap) 4rem;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+  }
 }

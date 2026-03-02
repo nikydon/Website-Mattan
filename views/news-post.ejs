@@ -1,0 +1,26 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<main>
+  <article class="section news-article">
+    <a href="/news" class="piece-breadcrumb">News</a>
+    <h1 class="page-title"><%= post.title %></h1>
+    <% if (post.publishedAt) { %>
+      <time class="news-date"><%= new Date(post.publishedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) %></time>
+    <% } %>
+
+    <div class="news-body">
+      <%- post.body.split('\n').map(p => '<p>' + p + '</p>').join('') %>
+    </div>
+
+    <% if (post.images.length) { %>
+    <div class="news-images">
+      <% post.images.forEach(img => { %>
+        <img src="/uploads/full/<%= img.filename %>" alt="<%= img.altText || post.title %>" loading="lazy" class="news-image">
+      <% }) %>
+    </div>
+    <% } %>
+  </article>
+</main>
+
+<%- include('partials/footer') %>

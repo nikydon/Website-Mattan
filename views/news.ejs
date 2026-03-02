@@ -1,0 +1,24 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<main>
+  <section class="section">
+    <h1 class="page-title">News</h1>
+
+    <% if (posts.length) { %>
+    <div class="news-list">
+      <% posts.forEach(post => { %>
+      <a href="/news/<%= post.slug %>" class="news-card">
+        <time class="news-date"><%= post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '' %></time>
+        <h2 class="news-title"><%= post.title %></h2>
+        <p class="news-excerpt"><%= post.body.substring(0, 160) %><%= post.body.length > 160 ? '...' : '' %></p>
+      </a>
+      <% }) %>
+    </div>
+    <% } else { %>
+    <p class="empty-state">No news yet.</p>
+    <% } %>
+  </section>
+</main>
+
+<%- include('partials/footer') %>
