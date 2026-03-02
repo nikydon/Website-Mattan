@@ -1,0 +1,40 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<div class="admin-main">
+  <div class="admin-header-row">
+    <h1 class="admin-page-title">News Posts</h1>
+    <a href="/admin/news/new" class="btn btn--primary">New Post</a>
+  </div>
+
+  <% if (typeof flash !== 'undefined' && flash) { %>
+    <p class="flash flash--success"><%= flash %></p>
+  <% } %>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Published</th>
+        <th>Date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% posts.forEach(post => { %>
+      <tr>
+        <td><a href="/admin/news/<%= post.id %>/edit"><%= post.title %></a></td>
+        <td><%= post.publishedAt ? 'Yes' : 'Draft' %></td>
+        <td class="muted"><%= post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('en-GB') : '—' %></td>
+        <td>
+          <form method="POST" action="/admin/news/<%= post.id %>/delete" onsubmit="return confirm('Delete this post?')">
+            <button type="submit" class="btn btn--danger btn--small">Delete</button>
+          </form>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,29 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<div class="admin-main">
+  <h1 class="admin-page-title"><%= isEdit ? 'Edit' : 'New' %> Post</h1>
+
+  <form method="POST" action="<%= isEdit ? '/admin/news/' + post.id + '/edit' : '/admin/news/new' %>" class="admin-form">
+    <label class="form-label" for="title">Title</label>
+    <input class="form-input" type="text" id="title" name="title" value="<%= isEdit ? post.title : '' %>" required>
+
+    <label class="form-label" for="slug">Slug</label>
+    <input class="form-input" type="text" id="slug" name="slug" value="<%= isEdit ? post.slug : '' %>" required>
+
+    <label class="form-label" for="body">Body</label>
+    <textarea class="form-input form-textarea form-textarea--tall" id="body" name="body" rows="12"><%= isEdit ? post.body : '' %></textarea>
+
+    <label class="form-checkbox">
+      <input type="checkbox" name="publish" value="true" <%= isEdit && post.publishedAt ? 'checked' : '' %>>
+      Published
+    </label>
+
+    <div class="form-actions">
+      <button class="btn btn--primary" type="submit">Save</button>
+      <a href="/admin/news" class="btn">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<%- include('partials/footer') %>

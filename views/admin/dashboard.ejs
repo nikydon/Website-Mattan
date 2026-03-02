@@ -1,0 +1,27 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<div class="admin-main">
+  <h1 class="admin-page-title">Dashboard</h1>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-number"><%= counts.collections %></span>
+      <span class="stat-label">Collections</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number"><%= counts.items %></span>
+      <span class="stat-label">Catalog Items</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number"><%= counts.images %></span>
+      <span class="stat-label">Images</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number"><%= counts.posts %></span>
+      <span class="stat-label">News Posts</span>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
