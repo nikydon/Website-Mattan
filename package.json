@@ -4,6 +4,7 @@
   "description": "Luxury jewelry brand website",
   "main": "server.js",
   "scripts": {
+    "build": "npx prisma generate && npx prisma migrate deploy",
     "start": "node server.js",
     "dev": "node server.js",
     "seed": "node prisma/seed.js"

@@ -4,9 +4,13 @@ const { loadSettings, getDefaultTenant } = require('../lib/settings');
 
 const router = express.Router();
 
+// Wrap async route handlers so errors reach Express error handler
+const wrap = (fn) => (req, res, next) => fn(req, res, next).catch(next);
+
 // ─── Homepage ────────────────────────────────────────
-router.get('/', async (req, res) => {
+router.get('/', wrap(async (req, res) => {
   const tenant = await getDefaultTenant();
+  if (!tenant) return res.status(503).send('Site is starting up — please refresh in a moment.');
   const settings = await loadSettings(tenant.id);
 
   const collections = await prisma.collection.findMany({
@@ -24,11 +28,12 @@ router.get('/', async (req, res) => {
   });
 
   res.render('index', { settings, collections });
-});
+}));
 
 // ─── Collections listing ─────────────────────────────
-router.get('/collections', async (req, res) => {
+router.get('/collections', wrap(async (req, res) => {
   const tenant = await getDefaultTenant();
+  if (!tenant) return res.status(503).send('Site is starting up — please refresh in a moment.');
   const settings = await loadSettings(tenant.id);
 
   const collections = await prisma.collection.findMany({
@@ -46,11 +51,12 @@ router.get('/collections', async (req, res) => {
   });
 
   res.render('collections', { pageTitle: 'Collections', settings, collections });
-});
+}));
 
 // ─── Single collection ───────────────────────────────
-router.get('/collections/:slug', async (req, res) => {
+router.get('/collections/:slug', wrap(async (req, res) => {
   const tenant = await getDefaultTenant();
+  if (!tenant) return res.status(503).send('Site is starting up — please refresh in a moment.');
   const settings = await loadSettings(tenant.id);
 
   const collection = await prisma.collection.findUnique({
@@ -69,11 +75,12 @@ router.get('/collections/:slug', async (req, res) => {
   }
 
   res.render('collection', { pageTitle: collection.name, settings, collection });
-});
+}));
 
 // ─── Single piece ────────────────────────────────────
-router.get('/pieces/:slug', async (req, res) => {
+router.get('/pieces/:slug', wrap(async (req, res) => {
   const tenant = await getDefaultTenant();
+  if (!tenant) return res.status(503).send('Site is starting up — please refresh in a moment.');
   const settings = await loadSettings(tenant.id);
 
   const item = await prisma.catalogItem.findUnique({
@@ -89,18 +96,20 @@ router.get('/pieces/:slug', async (req, res) => {
   }
 
   res.render('piece', { pageTitle: item.title, settings, item });
-});
+}));
 
 // ─── About ───────────────────────────────────────────
-router.get('/about', async (req, res) => {
+router.get('/about', wrap(async (req, res) => {
   const tenant = await getDefaultTenant();
+  if (!tenant) return res.status(503).send('Site is starting up — please refresh in a moment.');
   const settings = await loadSettings(tenant.id);
   res.render('about', { pageTitle: 'About', settings });
-});
+}));
 
 // ─── News listing ────────────────────────────────────
-router.get('/news', async (req, res) => {
+router.get('/news', wrap(async (req, res) => {
   const tenant = await getDefaultTenant();
+  if (!tenant) return res.status(503).send('Site is starting up — please refresh in a moment.');
   const settings = await loadSettings(tenant.id);
 
   const posts = await prisma.newsPost.findMany({
@@ -109,11 +118,12 @@ router.get('/news', async (req, res) => {
   });
 
   res.render('news', { pageTitle: 'News', settings, posts });
-});
+}));
 
 // ─── Single news post ────────────────────────────────
-router.get('/news/:slug', async (req, res) => {
+router.get('/news/:slug', wrap(async (req, res) => {
   const tenant = await getDefaultTenant();
+  if (!tenant) return res.status(503).send('Site is starting up — please refresh in a moment.');
   const settings = await loadSettings(tenant.id);
 
   const post = await prisma.newsPost.findUnique({
@@ -126,6 +136,6 @@ router.get('/news/:slug', async (req, res) => {
   }
 
   res.render('news-post', { pageTitle: post.title, settings, post });
-});
+}));
 
 module.exports = router;
