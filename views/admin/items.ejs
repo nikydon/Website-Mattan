@@ -1,0 +1,44 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<div class="admin-main">
+  <div class="admin-header-row">
+    <h1 class="admin-page-title">Catalog Items</h1>
+    <a href="/admin/items/new" class="btn btn--primary">New Item</a>
+  </div>
+
+  <% if (typeof flash !== 'undefined' && flash) { %>
+    <p class="flash flash--success"><%= flash %></p>
+  <% } %>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Collection</th>
+        <th>Price</th>
+        <th>Images</th>
+        <th>Published</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% items.forEach(item => { %>
+      <tr>
+        <td><a href="/admin/items/<%= item.id %>/edit"><%= item.title %></a></td>
+        <td class="muted"><%= item.collection ? item.collection.name : '—' %></td>
+        <td><%= item.price || '—' %></td>
+        <td><%= item._count.images %></td>
+        <td><%= item.published ? 'Yes' : 'No' %></td>
+        <td>
+          <form method="POST" action="/admin/items/<%= item.id %>/delete" onsubmit="return confirm('Delete this item?')">
+            <button type="submit" class="btn btn--danger btn--small">Delete</button>
+          </form>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,32 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<div class="admin-main">
+  <h1 class="admin-page-title"><%= isEdit ? 'Edit' : 'New' %> Collection</h1>
+
+  <form method="POST" action="<%= isEdit ? '/admin/collections/' + collection.id + '/edit' : '/admin/collections/new' %>" class="admin-form">
+    <label class="form-label" for="name">Name</label>
+    <input class="form-input" type="text" id="name" name="name" value="<%= isEdit ? collection.name : '' %>" required>
+
+    <label class="form-label" for="slug">Slug</label>
+    <input class="form-input" type="text" id="slug" name="slug" value="<%= isEdit ? collection.slug : '' %>" required>
+
+    <label class="form-label" for="description">Description</label>
+    <textarea class="form-input form-textarea" id="description" name="description" rows="3"><%= isEdit && collection.description ? collection.description : '' %></textarea>
+
+    <label class="form-label" for="sortOrder">Sort Order</label>
+    <input class="form-input" type="number" id="sortOrder" name="sortOrder" value="<%= isEdit ? collection.sortOrder : 0 %>">
+
+    <label class="form-checkbox">
+      <input type="checkbox" name="published" value="true" <%= isEdit && collection.published ? 'checked' : '' %>>
+      Published
+    </label>
+
+    <div class="form-actions">
+      <button class="btn btn--primary" type="submit">Save</button>
+      <a href="/admin/collections" class="btn">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<%- include('partials/footer') %>

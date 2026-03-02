@@ -1,0 +1,13 @@
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span class="brand-name">MATTAN</span>
+    <p class="footer-tagline"><%= typeof settings !== 'undefined' && settings.tagline ? settings.tagline : '' %></p>
+    <p class="footer-contact">
+      <% if (typeof settings !== 'undefined' && settings.contact_email) { %>
+        <a href="mailto:<%= settings.contact_email %>"><%= settings.contact_email %></a>
+      <% } %>
+    </p>
+  </div>
+</footer>
+</body>
+</html>

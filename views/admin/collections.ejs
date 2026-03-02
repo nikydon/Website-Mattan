@@ -1,0 +1,44 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<div class="admin-main">
+  <div class="admin-header-row">
+    <h1 class="admin-page-title">Collections</h1>
+    <a href="/admin/collections/new" class="btn btn--primary">New Collection</a>
+  </div>
+
+  <% if (typeof flash !== 'undefined' && flash) { %>
+    <p class="flash flash--success"><%= flash %></p>
+  <% } %>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Slug</th>
+        <th>Items</th>
+        <th>Published</th>
+        <th>Order</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% collections.forEach(col => { %>
+      <tr>
+        <td><a href="/admin/collections/<%= col.id %>/edit"><%= col.name %></a></td>
+        <td class="muted"><%= col.slug %></td>
+        <td><%= col._count.catalogItems %></td>
+        <td><%= col.published ? 'Yes' : 'No' %></td>
+        <td><%= col.sortOrder %></td>
+        <td>
+          <form method="POST" action="/admin/collections/<%= col.id %>/delete" onsubmit="return confirm('Delete this collection?')">
+            <button type="submit" class="btn btn--danger btn--small">Delete</button>
+          </form>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('partials/footer') %>

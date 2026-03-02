@@ -1,0 +1,33 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<div class="admin-main">
+  <h1 class="admin-page-title">Site Settings</h1>
+
+  <% if (typeof flash !== 'undefined' && flash) { %>
+    <p class="flash flash--success"><%= flash %></p>
+  <% } %>
+
+  <form method="POST" action="/admin/settings" class="admin-form">
+    <label class="form-label" for="brand_name">Brand Name</label>
+    <input class="form-input" type="text" id="brand_name" name="brand_name" value="<%= settings.brand_name || '' %>">
+
+    <label class="form-label" for="tagline">Tagline</label>
+    <input class="form-input" type="text" id="tagline" name="tagline" value="<%= settings.tagline || '' %>">
+
+    <label class="form-label" for="about_text">About Text</label>
+    <textarea class="form-input form-textarea" id="about_text" name="about_text" rows="5"><%= settings.about_text || '' %></textarea>
+
+    <label class="form-label" for="brand_story">Brand Story</label>
+    <textarea class="form-input form-textarea" id="brand_story" name="brand_story" rows="5"><%= settings.brand_story || '' %></textarea>
+
+    <label class="form-label" for="contact_email">Contact Email</label>
+    <input class="form-input" type="email" id="contact_email" name="contact_email" value="<%= settings.contact_email || '' %>">
+
+    <div class="form-actions">
+      <button class="btn btn--primary" type="submit">Save Settings</button>
+    </div>
+  </form>
+</div>
+
+<%- include('partials/footer') %>

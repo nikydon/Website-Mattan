@@ -1,0 +1,18 @@
+<%- include('partials/head') %>
+
+<main class="login-page">
+  <div class="login-card">
+    <h1 class="login-brand">MATTAN</h1>
+    <p class="login-subtitle">Admin</p>
+    <% if (typeof error !== 'undefined' && error) { %>
+      <p class="flash flash--error"><%= error %></p>
+    <% } %>
+    <form method="POST" action="/admin/login">
+      <label class="form-label" for="password">Password</label>
+      <input class="form-input" type="password" id="password" name="password" required autofocus>
+      <button class="btn btn--primary btn--full" type="submit">Sign In</button>
+    </form>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

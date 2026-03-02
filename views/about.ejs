@@ -1,0 +1,30 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<main>
+  <section class="section about-page">
+    <h1 class="page-title">About</h1>
+
+    <% if (settings.about_text) { %>
+    <div class="about-block">
+      <p><%= settings.about_text %></p>
+    </div>
+    <% } %>
+
+    <% if (settings.brand_story) { %>
+    <div class="about-block">
+      <h2 class="about-heading">The Story</h2>
+      <p><%= settings.brand_story %></p>
+    </div>
+    <% } %>
+
+    <% if (settings.contact_email) { %>
+    <div class="about-block">
+      <h2 class="about-heading">Contact</h2>
+      <p><a href="mailto:<%= settings.contact_email %>"><%= settings.contact_email %></a></p>
+    </div>
+    <% } %>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

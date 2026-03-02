@@ -2,15 +2,10 @@
 <%- include('partials/nav') %>
 
 <main>
-  <section class="hero">
-    <h1 class="hero-title">MATTAN</h1>
-    <p class="hero-tagline"><%= settings.tagline || '' %></p>
-    <a href="/collections" class="hero-cta">View Collections</a>
-  </section>
+  <section class="section">
+    <h1 class="page-title">Collections</h1>
 
-  <% if (collections.length) { %>
-  <section class="section collections-preview">
-    <h2 class="section-title">Collections</h2>
+    <% if (collections.length) { %>
     <div class="grid grid-4">
       <% collections.forEach(col => { %>
       <a href="/collections/<%= col.slug %>" class="card">
@@ -20,12 +15,17 @@
           <div class="card-img card-img--empty"></div>
         <% } %>
         <h3 class="card-title"><%= col.name %></h3>
+        <% if (col.description) { %>
+          <p class="card-desc"><%= col.description %></p>
+        <% } %>
         <p class="card-count"><%= col._count.catalogItems %> piece<%= col._count.catalogItems !== 1 ? 's' : '' %></p>
       </a>
       <% }) %>
     </div>
+    <% } else { %>
+    <p class="empty-state">No collections yet.</p>
+    <% } %>
   </section>
-  <% } %>
 </main>
 
 <%- include('partials/footer') %>
