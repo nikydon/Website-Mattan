@@ -16,7 +16,11 @@
     <% if (post.images.length) { %>
     <div class="news-images">
       <% post.images.forEach(img => { %>
-        <img src="/uploads/full/<%= img.filename %>" alt="<%= img.altText || post.title %>" loading="lazy" class="news-image">
+        <% if (img.mediaType === 'video') { %>
+          <video src="/uploads/full/<%= img.filename %>" controls playsinline preload="metadata" class="news-image news-video"></video>
+        <% } else { %>
+          <img src="/uploads/full/<%= img.filename %>" alt="<%= img.altText || post.title %>" loading="lazy" class="news-image">
+        <% } %>
       <% }) %>
     </div>
     <% } %>

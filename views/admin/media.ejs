@@ -1,0 +1,66 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<div class="admin-main">
+  <div class="admin-header-row">
+    <h1 class="admin-page-title">Media Library</h1>
+  </div>
+
+  <% if (typeof flash !== 'undefined' && flash) { %>
+    <p class="flash flash--success"><%= flash %></p>
+  <% } %>
+
+  <!-- Upload form -->
+  <form method="POST" action="/admin/media/upload" enctype="multipart/form-data" class="media-upload-bar">
+    <input type="file" name="file" accept="image/*,video/mp4,video/webm,video/quicktime" required class="form-input" style="flex:1">
+    <input type="text" name="altText" placeholder="Alt text / caption" class="form-input" style="flex:1">
+    <select name="category" class="form-input" style="width:auto">
+      <option value="general">General</option>
+      <option value="catalog">Catalog</option>
+      <option value="news">News</option>
+    </select>
+    <button type="submit" class="btn btn--primary">Upload</button>
+  </form>
+
+  <!-- Filter tabs -->
+  <div class="media-filters">
+    <a href="/admin/media" class="btn btn--small <%= filter === 'all' ? 'btn--primary' : '' %>">All</a>
+    <a href="/admin/media?type=image" class="btn btn--small <%= filter === 'image' ? 'btn--primary' : '' %>">Images</a>
+    <a href="/admin/media?type=video" class="btn btn--small <%= filter === 'video' ? 'btn--primary' : '' %>">Videos</a>
+    <span class="muted" style="margin-left:0.5rem"><%= media.length %> file<%= media.length !== 1 ? 's' : '' %></span>
+  </div>
+
+  <% if (media.length) { %>
+  <div class="media-grid">
+    <% media.forEach(m => { %>
+    <div class="media-card">
+      <% if (m.mediaType === 'video') { %>
+        <div class="media-thumb media-thumb--video">
+          <video src="/uploads/full/<%= m.filename %>" muted preload="metadata"></video>
+          <span class="media-badge">VIDEO</span>
+        </div>
+      <% } else { %>
+        <div class="media-thumb">
+          <img src="/uploads/thumbs/<%= m.filename.replace(/\.\w+$/, '.webp') %>" alt="<%= m.altText || m.originalName %>">
+        </div>
+      <% } %>
+      <div class="media-card-info">
+        <span class="media-card-name" title="<%= m.originalName %>"><%= m.originalName %></span>
+        <span class="muted" style="font-size:0.7rem">
+          <%= m.category %>
+          <% if (m.catalogItem) { %> &middot; <%= m.catalogItem.title %><% } %>
+          <% if (m.newsPost) { %> &middot; <%= m.newsPost.title %><% } %>
+        </span>
+      </div>
+      <form method="POST" action="/admin/media/<%= m.id %>/delete" class="media-card-actions">
+        <button type="submit" class="btn btn--danger btn--small" onclick="return confirm('Delete this file?')">Delete</button>
+      </form>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <p class="empty-state" style="margin-top:2rem">No media files yet. Upload your first photo or video above.</p>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>

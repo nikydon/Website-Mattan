@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const prisma = require('../../lib/prisma');
 const { getDefaultTenant } = require('../../lib/settings');
-const { upload, generateThumbnail, FULL_DIR, THUMB_DIR } = require('../../lib/upload');
+const { upload, generateThumbnail, detectMediaType, FULL_DIR, THUMB_DIR } = require('../../lib/upload');
 
 const router = express.Router();
 
@@ -103,14 +103,15 @@ router.post('/:id/delete', async (req, res) => {
   res.redirect('/admin/items?msg=Item deleted.');
 });
 
-// ─── Image upload for an item ────────────────────────
+// ─── Media upload for an item ────────────────────────
 router.post('/:id/images', upload.single('file'), async (req, res) => {
   if (!req.file) return res.redirect(`/admin/items/${req.params.id}/edit`);
 
   const item = await prisma.catalogItem.findUnique({ where: { id: req.params.id } });
   if (!item) return res.redirect('/admin/items');
 
-  await generateThumbnail(req.file.filename);
+  const mediaType = detectMediaType(req.file.mimetype);
+  await generateThumbnail(req.file.filename, req.file.mimetype);
 
   const lastImage = await prisma.image.findFirst({
     where: { catalogItemId: item.id },
@@ -124,6 +125,7 @@ router.post('/:id/images', upload.single('file'), async (req, res) => {
       filename: req.file.filename,
       originalName: req.file.originalname,
       altText: req.body.altText || null,
+      mediaType,
       category: 'catalog',
       sortOrder: lastImage ? lastImage.sortOrder + 1 : 0,
     },
