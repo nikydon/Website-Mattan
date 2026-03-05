@@ -8,7 +8,6 @@ datasource db {
 }
 
 // ─── Tenant ──────────────────────────────────────────────
-// One row per brand/site. Every other table references this.
 model Tenant {
   id        String   @id @default(uuid())
   name      String
@@ -20,12 +19,14 @@ model Tenant {
   images       Image[]
   newsPosts    NewsPost[]
   siteSettings SiteSetting[]
+  customers    Customer[]
+  orders       Order[]
+  coupons      Coupon[]
 
   @@map("tenants")
 }
 
 // ─── Collection ──────────────────────────────────────────
-// A group of jewelry pieces, e.g. "Rings", "Earrings".
 model Collection {
   id          String   @id @default(uuid())
   tenantId    String   @map("tenant_id")
@@ -45,7 +46,6 @@ model Collection {
 }
 
 // ─── CatalogItem ─────────────────────────────────────────
-// A single jewelry piece.
 model CatalogItem {
   id           String   @id @default(uuid())
   tenantId     String   @map("tenant_id")
@@ -55,6 +55,8 @@ model CatalogItem {
   description  String?
   price        String?
   materials    String?
+  stockQty     Int      @default(0) @map("stock_qty")
+  tags         String?
   sortOrder    Int      @default(0) @map("sort_order")
   published    Boolean  @default(false)
   createdAt    DateTime @default(now()) @map("created_at")
@@ -63,13 +65,13 @@ model CatalogItem {
   tenant     Tenant      @relation(fields: [tenantId], references: [id])
   collection Collection? @relation(fields: [collectionId], references: [id])
   images     Image[]
+  orderItems OrderItem[]
 
   @@unique([tenantId, slug])
   @@map("catalog_items")
 }
 
 // ─── Image ───────────────────────────────────────────────
-// An uploaded media file (image or video). Can be linked to a catalog item, news post, or standalone.
 model Image {
   id            String   @id @default(uuid())
   tenantId      String   @map("tenant_id")
@@ -91,7 +93,6 @@ model Image {
 }
 
 // ─── NewsPost ────────────────────────────────────────────
-// A news article or update.
 model NewsPost {
   id          String    @id @default(uuid())
   tenantId    String    @map("tenant_id")
@@ -110,7 +111,6 @@ model NewsPost {
 }
 
 // ─── SiteSetting ─────────────────────────────────────────
-// Key-value pairs for editable text: brand story, about page, etc.
 model SiteSetting {
   id       String @id @default(uuid())
   tenantId String @map("tenant_id")
@@ -121,4 +121,75 @@ model SiteSetting {
 
   @@unique([tenantId, key])
   @@map("site_settings")
+}
+
+// ─── Customer ────────────────────────────────────────────
+model Customer {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  email     String
+  name      String?
+  phone     String?
+  notes     String?
+  flagged   Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tenant Tenant  @relation(fields: [tenantId], references: [id])
+  orders Order[]
+
+  @@unique([tenantId, email])
+  @@map("customers")
+}
+
+// ─── Order ───────────────────────────────────────────────
+model Order {
+  id         String   @id @default(uuid())
+  tenantId   String   @map("tenant_id")
+  customerId String?  @map("customer_id")
+  status     String   @default("pending")
+  total      String?
+  notes      String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  tenant   Tenant     @relation(fields: [tenantId], references: [id])
+  customer Customer?  @relation(fields: [customerId], references: [id])
+  items    OrderItem[]
+
+  @@map("orders")
+}
+
+// ─── OrderItem ───────────────────────────────────────────
+model OrderItem {
+  id            String  @id @default(uuid())
+  orderId       String  @map("order_id")
+  catalogItemId String? @map("catalog_item_id")
+  title         String
+  price         String?
+  quantity      Int     @default(1)
+
+  order       Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  catalogItem CatalogItem? @relation(fields: [catalogItemId], references: [id])
+
+  @@map("order_items")
+}
+
+// ─── Coupon ──────────────────────────────────────────────
+model Coupon {
+  id         String    @id @default(uuid())
+  tenantId   String    @map("tenant_id")
+  code       String
+  discount   String
+  type       String    @default("percentage")
+  usageLimit Int?      @map("usage_limit")
+  usageCount Int       @default(0) @map("usage_count")
+  expiresAt  DateTime? @map("expires_at")
+  active     Boolean   @default(true)
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, code])
+  @@map("coupons")
 }
