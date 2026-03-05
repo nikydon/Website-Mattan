@@ -7,12 +7,22 @@
       <div class="piece-gallery">
         <% if (item.images.length) { %>
           <% item.images.forEach((img, i) => { %>
-          <img
-            src="/uploads/full/<%= img.filename %>"
-            alt="<%= img.altText || item.title %>"
-            class="piece-image<%= i === 0 ? ' piece-image--main' : '' %>"
-            loading="<%= i === 0 ? 'eager' : 'lazy' %>"
-          >
+            <% if (img.mediaType === 'video') { %>
+            <video
+              src="/uploads/full/<%= img.filename %>"
+              class="piece-image piece-video<%= i === 0 ? ' piece-image--main' : '' %>"
+              controls
+              playsinline
+              preload="metadata"
+            ></video>
+            <% } else { %>
+            <img
+              src="/uploads/full/<%= img.filename %>"
+              alt="<%= img.altText || item.title %>"
+              class="piece-image<%= i === 0 ? ' piece-image--main' : '' %>"
+              loading="<%= i === 0 ? 'eager' : 'lazy' %>"
+            >
+            <% } %>
           <% }) %>
         <% } else { %>
           <div class="piece-image piece-image--empty"></div>

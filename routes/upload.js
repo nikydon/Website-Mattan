@@ -2,7 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const prisma = require('../lib/prisma');
-const { upload, generateThumbnail, FULL_DIR, THUMB_DIR } = require('../lib/upload');
+const { upload, generateThumbnail, detectMediaType, FULL_DIR, THUMB_DIR } = require('../lib/upload');
 
 const router = express.Router();
 
@@ -27,8 +27,8 @@ router.post('/', upload.single('file'), async (req, res) => {
       return res.status(400).json({ error: 'tenantId is required.' });
     }
 
-    // Generate thumbnail
-    const thumbName = await generateThumbnail(req.file.filename);
+    const mediaType = detectMediaType(req.file.mimetype);
+    const thumbName = await generateThumbnail(req.file.filename, req.file.mimetype);
 
     // Determine sort order (append to end)
     const lastImage = await prisma.image.findFirst({
@@ -44,6 +44,7 @@ router.post('/', upload.single('file'), async (req, res) => {
         filename: req.file.filename,
         originalName: req.file.originalname,
         altText: altText || null,
+        mediaType,
         category: category || 'catalog',
         catalogItemId: catalogItemId || null,
         newsPostId: newsPostId || null,

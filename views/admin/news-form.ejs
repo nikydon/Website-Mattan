@@ -24,6 +24,37 @@
       <a href="/admin/news" class="btn">Cancel</a>
     </div>
   </form>
+
+  <% if (isEdit) { %>
+  <hr class="admin-divider">
+  <h2 class="admin-section-title">Media (Photos &amp; Videos)</h2>
+
+  <div class="image-grid">
+    <% post.images.forEach(img => { %>
+    <div class="image-card">
+      <% if (img.mediaType === 'video') { %>
+        <div class="media-thumb media-thumb--video">
+          <video src="/uploads/full/<%= img.filename %>" muted preload="metadata"></video>
+          <span class="media-badge">VIDEO</span>
+        </div>
+      <% } else { %>
+        <img src="/uploads/thumbs/<%= img.filename.replace(/\.\w+$/, '.webp') %>" alt="<%= img.altText || post.title %>">
+      <% } %>
+      <form method="POST" action="/admin/news/<%= post.id %>/media/<%= img.id %>/delete" class="image-delete-form">
+        <button type="submit" class="btn btn--danger btn--small" onclick="return confirm('Delete this file?')">Remove</button>
+      </form>
+    </div>
+    <% }) %>
+  </div>
+
+  <form method="POST" action="/admin/news/<%= post.id %>/media" enctype="multipart/form-data" class="admin-form upload-form">
+    <label class="form-label" for="file">Add Photo or Video</label>
+    <input class="form-input" type="file" id="file" name="file" accept="image/*,video/mp4,video/webm,video/quicktime" required>
+    <label class="form-label" for="altText">Alt Text / Caption</label>
+    <input class="form-input" type="text" id="altText" name="altText" placeholder="Describe the media">
+    <button class="btn btn--primary" type="submit">Upload</button>
+  </form>
+  <% } %>
 </div>
 
 <%- include('partials/footer') %>

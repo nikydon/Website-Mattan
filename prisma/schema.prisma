@@ -69,13 +69,14 @@ model CatalogItem {
 }
 
 // ─── Image ───────────────────────────────────────────────
-// An uploaded image. Can be linked to a catalog item, news post, or standalone.
+// An uploaded media file (image or video). Can be linked to a catalog item, news post, or standalone.
 model Image {
   id            String   @id @default(uuid())
   tenantId      String   @map("tenant_id")
   filename      String
   originalName  String   @map("original_name")
   altText       String?  @map("alt_text")
+  mediaType     String   @default("image") @map("media_type")
   category      String   @default("catalog")
   catalogItemId String?  @map("catalog_item_id")
   newsPostId    String?  @map("news_post_id")

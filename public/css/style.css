@@ -231,6 +231,12 @@ img {
   background: var(--color-card-bg);
 }
 
+.piece-video {
+  width: 100%;
+  background: #000;
+  border-radius: 2px;
+}
+
 .piece-image--empty {
   aspect-ratio: 3 / 4;
   background: var(--color-card-bg);
@@ -364,6 +370,12 @@ img {
 
 .news-image {
   width: 100%;
+}
+
+.news-video {
+  width: 100%;
+  background: #000;
+  border-radius: 2px;
 }
 
 /* ─── 404 ───────────────────────────────────────────── */

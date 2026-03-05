@@ -36,13 +36,15 @@ router.get('/', async (req, res) => {
     prisma.image.count({ where: { tenantId: tenant.id } }),
     prisma.newsPost.count({ where: { tenantId: tenant.id } }),
   ]);
-  res.render('admin/dashboard', { pageTitle: 'Dashboard', counts: { collections, items, images, posts } });
+  const videos = await prisma.image.count({ where: { tenantId: tenant.id, mediaType: 'video' } });
+  res.render('admin/dashboard', { pageTitle: 'Dashboard', counts: { collections, items, images, posts, videos } });
 });
 
 // ─── Mount sub-routers ───────────────────────────────
 router.use('/collections', require('./collections'));
 router.use('/items', require('./items'));
 router.use('/news', require('./news'));
+router.use('/media', require('./media'));
 router.use('/settings', require('./settings'));
 
 module.exports = router;
