@@ -2,30 +2,111 @@
 <%- include('partials/nav') %>
 
 <div class="admin-main">
-  <h1 class="admin-page-title">Site Settings</h1>
+  <div class="breadcrumbs">
+    <a href="/admin">Dashboard</a>
+    <span class="sep">/</span>
+    <span class="current">Settings</span>
+  </div>
+
+  <h1 class="admin-page-title">Settings</h1>
 
   <% if (typeof flash !== 'undefined' && flash) { %>
     <p class="flash flash--success"><%= flash %></p>
   <% } %>
 
-  <form method="POST" action="/admin/settings" class="admin-form">
-    <label class="form-label" for="brand_name">Brand Name</label>
-    <input class="form-input" type="text" id="brand_name" name="brand_name" value="<%= settings.brand_name || '' %>">
+  <form method="POST" action="/admin/settings">
+    <!-- General -->
+    <div class="settings-section">
+      <h3 class="settings-section-title">General</h3>
+      <p class="settings-section-desc">Basic store information</p>
 
-    <label class="form-label" for="tagline">Tagline</label>
-    <input class="form-input" type="text" id="tagline" name="tagline" value="<%= settings.tagline || '' %>">
+      <div class="form-row" style="max-width:600px">
+        <div>
+          <label class="form-label mt-0" for="brand_name">Store Name</label>
+          <input class="form-input" type="text" id="brand_name" name="brand_name" value="<%= settings.brand_name || '' %>">
+        </div>
+        <div>
+          <label class="form-label mt-0" for="contact_email">Contact Email</label>
+          <input class="form-input" type="email" id="contact_email" name="contact_email" value="<%= settings.contact_email || '' %>">
+        </div>
+      </div>
 
-    <label class="form-label" for="about_text">About Text</label>
-    <textarea class="form-input form-textarea" id="about_text" name="about_text" rows="5"><%= settings.about_text || '' %></textarea>
+      <label class="form-label" for="tagline">Tagline</label>
+      <input class="form-input" type="text" id="tagline" name="tagline" value="<%= settings.tagline || '' %>" style="max-width:600px">
+    </div>
 
-    <label class="form-label" for="brand_story">Brand Story</label>
-    <textarea class="form-input form-textarea" id="brand_story" name="brand_story" rows="5"><%= settings.brand_story || '' %></textarea>
+    <!-- Brand Content -->
+    <div class="settings-section">
+      <h3 class="settings-section-title">Brand Content</h3>
+      <p class="settings-section-desc">Content displayed on your storefront</p>
 
-    <label class="form-label" for="contact_email">Contact Email</label>
-    <input class="form-input" type="email" id="contact_email" name="contact_email" value="<%= settings.contact_email || '' %>">
+      <label class="form-label mt-0" for="about_text">About Text</label>
+      <textarea class="form-input form-textarea" id="about_text" name="about_text" rows="4" style="max-width:600px"><%= settings.about_text || '' %></textarea>
+
+      <label class="form-label" for="brand_story">Brand Story</label>
+      <textarea class="form-input form-textarea" id="brand_story" name="brand_story" rows="4" style="max-width:600px"><%= settings.brand_story || '' %></textarea>
+    </div>
+
+    <!-- Currency & Pricing -->
+    <div class="settings-section">
+      <h3 class="settings-section-title">Currency & Pricing</h3>
+      <p class="settings-section-desc">Configure your store currency and pricing display</p>
+
+      <div class="form-row" style="max-width:600px">
+        <div>
+          <label class="form-label mt-0" for="currency">Currency</label>
+          <select class="form-input" id="currency" name="currency">
+            <option value="EUR" <%= settings.currency === 'EUR' || !settings.currency ? 'selected' : '' %>>EUR</option>
+            <option value="USD" <%= settings.currency === 'USD' ? 'selected' : '' %>>USD</option>
+            <option value="GBP" <%= settings.currency === 'GBP' ? 'selected' : '' %>>GBP</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label mt-0" for="tax_rate">Tax Rate (%)</label>
+          <input class="form-input" type="text" id="tax_rate" name="tax_rate" value="<%= settings.tax_rate || '' %>" placeholder="e.g. 21">
+        </div>
+      </div>
+    </div>
+
+    <!-- Shipping -->
+    <div class="settings-section">
+      <h3 class="settings-section-title">Shipping</h3>
+      <p class="settings-section-desc">Configure shipping options</p>
+
+      <div class="form-row" style="max-width:600px">
+        <div>
+          <label class="form-label mt-0" for="shipping_flat_rate">Flat Rate Shipping</label>
+          <input class="form-input" type="text" id="shipping_flat_rate" name="shipping_flat_rate" value="<%= settings.shipping_flat_rate || '' %>" placeholder="e.g. 15">
+        </div>
+        <div>
+          <label class="form-label mt-0" for="free_shipping_threshold">Free Shipping Over</label>
+          <input class="form-input" type="text" id="free_shipping_threshold" name="free_shipping_threshold" value="<%= settings.free_shipping_threshold || '' %>" placeholder="e.g. 200">
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Links -->
+    <div class="settings-section">
+      <h3 class="settings-section-title">Social Links</h3>
+      <p class="settings-section-desc">Social media profile URLs</p>
+
+      <div class="form-row" style="max-width:600px">
+        <div>
+          <label class="form-label mt-0" for="social_instagram">Instagram</label>
+          <input class="form-input" type="url" id="social_instagram" name="social_instagram" value="<%= settings.social_instagram || '' %>" placeholder="https://instagram.com/...">
+        </div>
+        <div>
+          <label class="form-label mt-0" for="social_tiktok">TikTok</label>
+          <input class="form-input" type="url" id="social_tiktok" name="social_tiktok" value="<%= settings.social_tiktok || '' %>" placeholder="https://tiktok.com/...">
+        </div>
+      </div>
+    </div>
 
     <div class="form-actions">
-      <button class="btn btn--primary" type="submit">Save Settings</button>
+      <button class="btn btn--primary" type="submit">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+        Save All Settings
+      </button>
     </div>
   </form>
 </div>

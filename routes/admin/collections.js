@@ -12,12 +12,12 @@ router.get('/', async (req, res) => {
     orderBy: { sortOrder: 'asc' },
     include: { _count: { select: { catalogItems: true } } },
   });
-  res.render('admin/collections', { pageTitle: 'Collections', collections, flash: req.query.msg });
+  res.render('admin/collections', { pageTitle: 'Collections', activePage: 'collections', collections, flash: req.query.msg });
 });
 
 // New form
 router.get('/new', (req, res) => {
-  res.render('admin/collection-form', { pageTitle: 'New Collection', isEdit: false });
+  res.render('admin/collection-form', { pageTitle: 'New Collection', activePage: 'collections', isEdit: false });
 });
 
 // Create
@@ -41,7 +41,7 @@ router.post('/new', async (req, res) => {
 router.get('/:id/edit', async (req, res) => {
   const collection = await prisma.collection.findUnique({ where: { id: req.params.id } });
   if (!collection) return res.redirect('/admin/collections');
-  res.render('admin/collection-form', { pageTitle: 'Edit Collection', isEdit: true, collection });
+  res.render('admin/collection-form', { pageTitle: 'Edit Collection', activePage: 'collections', isEdit: true, collection });
 });
 
 // Update

@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
       _count: { select: { images: true } },
     },
   });
-  res.render('admin/items', { pageTitle: 'Catalog Items', items, flash: req.query.msg });
+  res.render('admin/items', { pageTitle: 'Products', activePage: 'items', items, flash: req.query.msg });
 });
 
 // New form
@@ -28,13 +28,13 @@ router.get('/new', async (req, res) => {
     where: { tenantId: tenant.id },
     orderBy: { sortOrder: 'asc' },
   });
-  res.render('admin/item-form', { pageTitle: 'New Item', isEdit: false, collections });
+  res.render('admin/item-form', { pageTitle: 'New Item', activePage: 'items', isEdit: false, collections });
 });
 
 // Create
 router.post('/new', async (req, res) => {
   const tenant = await getDefaultTenant();
-  const { title, slug, collectionId, description, price, materials, sortOrder, published } = req.body;
+  const { title, slug, collectionId, description, price, materials, stockQty, tags, sortOrder, published } = req.body;
   await prisma.catalogItem.create({
     data: {
       tenantId: tenant.id,
@@ -44,6 +44,8 @@ router.post('/new', async (req, res) => {
       description: description || null,
       price: price || null,
       materials: materials || null,
+      stockQty: parseInt(stockQty) || 0,
+      tags: tags || null,
       sortOrder: parseInt(sortOrder) || 0,
       published: published === 'true',
     },
@@ -65,12 +67,12 @@ router.get('/:id/edit', async (req, res) => {
     }),
   ]);
   if (!item) return res.redirect('/admin/items');
-  res.render('admin/item-form', { pageTitle: 'Edit Item', isEdit: true, item, collections });
+  res.render('admin/item-form', { pageTitle: 'Edit Item', activePage: 'items', isEdit: true, item, collections });
 });
 
 // Update
 router.post('/:id/edit', async (req, res) => {
-  const { title, slug, collectionId, description, price, materials, sortOrder, published } = req.body;
+  const { title, slug, collectionId, description, price, materials, stockQty, tags, sortOrder, published } = req.body;
   await prisma.catalogItem.update({
     where: { id: req.params.id },
     data: {
@@ -80,6 +82,8 @@ router.post('/:id/edit', async (req, res) => {
       description: description || null,
       price: price || null,
       materials: materials || null,
+      stockQty: parseInt(stockQty) || 0,
+      tags: tags || null,
       sortOrder: parseInt(sortOrder) || 0,
       published: published === 'true',
     },

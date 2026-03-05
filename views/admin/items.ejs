@@ -2,43 +2,80 @@
 <%- include('partials/nav') %>
 
 <div class="admin-main">
+  <div class="breadcrumbs">
+    <a href="/admin">Dashboard</a>
+    <span class="sep">/</span>
+    <span class="current">Products</span>
+  </div>
+
   <div class="admin-header-row">
-    <h1 class="admin-page-title">Catalog Items</h1>
-    <a href="/admin/items/new" class="btn btn--primary">New Item</a>
+    <h1 class="admin-page-title">Products</h1>
+    <a href="/admin/items/new" class="btn btn--primary">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg>
+      New Product
+    </a>
   </div>
 
   <% if (typeof flash !== 'undefined' && flash) { %>
     <p class="flash flash--success"><%= flash %></p>
   <% } %>
 
-  <table class="admin-table">
+  <div class="table-toolbar">
+    <div class="search-box">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="itemsSearch" placeholder="Search products..." autocomplete="off">
+    </div>
+    <span class="muted" style="font-size:0.8rem"><span id="itemsTable-count"><%= items.length %></span> products</span>
+  </div>
+
+  <table class="admin-table" id="itemsTable">
     <thead>
       <tr>
-        <th>Title</th>
-        <th>Collection</th>
-        <th>Price</th>
+        <th class="sortable">Title <span class="sort-icon">&#8597;</span></th>
+        <th class="sortable">Collection <span class="sort-icon">&#8597;</span></th>
+        <th class="sortable">Price <span class="sort-icon">&#8597;</span></th>
+        <th class="sortable">Stock <span class="sort-icon">&#8597;</span></th>
         <th>Images</th>
-        <th>Published</th>
+        <th>Status</th>
         <th></th>
       </tr>
     </thead>
     <tbody>
-      <% items.forEach(item => { %>
+      <% items.forEach(function(item) { %>
       <tr>
         <td><a href="/admin/items/<%= item.id %>/edit"><%= item.title %></a></td>
-        <td class="muted"><%= item.collection ? item.collection.name : '—' %></td>
-        <td><%= item.price || '—' %></td>
-        <td><%= item._count.images %></td>
-        <td><%= item.published ? 'Yes' : 'No' %></td>
+        <td class="muted"><%= item.collection ? item.collection.name : '-' %></td>
+        <td><%= item.price || '-' %></td>
         <td>
-          <form method="POST" action="/admin/items/<%= item.id %>/delete" onsubmit="return confirm('Delete this item?')">
+          <% if (item.stockQty <= 5 && item.stockQty > 0) { %>
+            <span class="badge badge--warning"><%= item.stockQty %></span>
+          <% } else if (item.stockQty === 0) { %>
+            <span class="badge badge--danger">0</span>
+          <% } else { %>
+            <%= item.stockQty %>
+          <% } %>
+        </td>
+        <td><%= item._count.images %></td>
+        <td><span class="badge badge--<%= item.published ? 'success' : 'neutral' %>"><%= item.published ? 'Live' : 'Draft' %></span></td>
+        <td class="actions-cell">
+          <form method="POST" action="/admin/items/<%= item.id %>/delete" onsubmit="return confirmDelete(this, 'Delete Product', 'Are you sure you want to delete &quot;<%= item.title %>&quot;? This cannot be undone.')">
             <button type="submit" class="btn btn--danger btn--small">Delete</button>
           </form>
         </td>
       </tr>
-      <% }) %>
+      <% }); %>
     </tbody>
   </table>
+
+  <div class="pagination" id="itemsTable-pagination">
+    <span class="pagination-info"></span>
+    <div class="pagination-buttons"></div>
+  </div>
 </div>
 
 <%- include('partials/footer') %>
+<script>
+  initTableSearch('itemsSearch', 'itemsTable');
+  initTableSort('itemsTable');
+  initPagination('itemsTable', 15);
+</script>

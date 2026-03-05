@@ -4,13 +4,17 @@ const { loadSettings, getDefaultTenant } = require('../../lib/settings');
 
 const router = express.Router();
 
-const SETTING_KEYS = ['brand_name', 'tagline', 'about_text', 'brand_story', 'contact_email'];
+const SETTING_KEYS = [
+  'brand_name', 'tagline', 'about_text', 'brand_story', 'contact_email',
+  'currency', 'tax_rate', 'shipping_flat_rate', 'free_shipping_threshold',
+  'social_instagram', 'social_tiktok',
+];
 
 // Show form
 router.get('/', async (req, res) => {
   const tenant = await getDefaultTenant();
   const settings = await loadSettings(tenant.id);
-  res.render('admin/settings', { pageTitle: 'Settings', settings, flash: req.query.msg });
+  res.render('admin/settings', { pageTitle: 'Settings', activePage: 'settings', settings, flash: req.query.msg });
 });
 
 // Save

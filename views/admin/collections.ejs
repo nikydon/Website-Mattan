@@ -2,43 +2,63 @@
 <%- include('partials/nav') %>
 
 <div class="admin-main">
+  <div class="breadcrumbs">
+    <a href="/admin">Dashboard</a>
+    <span class="sep">/</span>
+    <span class="current">Collections</span>
+  </div>
+
   <div class="admin-header-row">
     <h1 class="admin-page-title">Collections</h1>
-    <a href="/admin/collections/new" class="btn btn--primary">New Collection</a>
+    <a href="/admin/collections/new" class="btn btn--primary">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg>
+      New Collection
+    </a>
   </div>
 
   <% if (typeof flash !== 'undefined' && flash) { %>
     <p class="flash flash--success"><%= flash %></p>
   <% } %>
 
-  <table class="admin-table">
+  <div class="table-toolbar">
+    <div class="search-box">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="colSearch" placeholder="Search collections..." autocomplete="off">
+    </div>
+  </div>
+
+  <table class="admin-table" id="colTable">
     <thead>
       <tr>
-        <th>Name</th>
+        <th class="sortable">Name <span class="sort-icon">&#8597;</span></th>
         <th>Slug</th>
-        <th>Items</th>
-        <th>Published</th>
-        <th>Order</th>
+        <th class="sortable">Items <span class="sort-icon">&#8597;</span></th>
+        <th>Status</th>
+        <th class="sortable">Order <span class="sort-icon">&#8597;</span></th>
         <th></th>
       </tr>
     </thead>
     <tbody>
-      <% collections.forEach(col => { %>
+      <% collections.forEach(function(col) { %>
       <tr>
         <td><a href="/admin/collections/<%= col.id %>/edit"><%= col.name %></a></td>
         <td class="muted"><%= col.slug %></td>
         <td><%= col._count.catalogItems %></td>
-        <td><%= col.published ? 'Yes' : 'No' %></td>
+        <td><span class="badge badge--<%= col.published ? 'success' : 'neutral' %>"><%= col.published ? 'Live' : 'Draft' %></span></td>
         <td><%= col.sortOrder %></td>
-        <td>
-          <form method="POST" action="/admin/collections/<%= col.id %>/delete" onsubmit="return confirm('Delete this collection?')">
+        <td class="actions-cell">
+          <form method="POST" action="/admin/collections/<%= col.id %>/delete" onsubmit="return confirmDelete(this, 'Delete Collection', 'This will permanently delete the collection. Products in it will become uncategorized.')">
             <button type="submit" class="btn btn--danger btn--small">Delete</button>
           </form>
         </td>
       </tr>
-      <% }) %>
+      <% }); %>
     </tbody>
   </table>
 </div>
 
 <%- include('partials/footer') %>
+<script>
+  initTableSearch('colSearch', 'colTable');
+  initTableSort('colTable');
+</script>

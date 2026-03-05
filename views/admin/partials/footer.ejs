@@ -1,2 +1,191 @@
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Confirmation Modal -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <h3 class="modal-title" id="confirmTitle">Confirm Action</h3>
+    <p class="modal-body" id="confirmBody">Are you sure you want to proceed?</p>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn--danger" id="confirmAction">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Sidebar Toggle ──────────────────────────────────
+function toggleSidebar() {
+  document.documentElement.classList.toggle('sidebar-collapsed');
+  localStorage.setItem('sidebar-collapsed', document.documentElement.classList.contains('sidebar-collapsed'));
+}
+
+function toggleMobileSidebar() {
+  var sidebar = document.getElementById('adminSidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+  sidebar.classList.toggle('mobile-open');
+  overlay.classList.toggle('active');
+}
+
+// ─── Dark Mode Toggle ────────────────────────────────
+function toggleTheme() {
+  var html = document.documentElement;
+  var current = html.getAttribute('data-theme');
+  var next = current === 'dark' ? '' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('admin-theme', next);
+}
+
+// ─── Toast Notifications ─────────────────────────────
+function showToast(message, type) {
+  type = type || 'success';
+  var container = document.getElementById('toastContainer');
+  var icons = {
+    success: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>',
+    error: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>',
+    info: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+  };
+  var toast = document.createElement('div');
+  toast.className = 'toast toast--' + type;
+  toast.innerHTML = (icons[type] || icons.info) + '<span>' + message + '</span><button class="toast-close" onclick="this.parentElement.remove()">&times;</button>';
+  container.appendChild(toast);
+  setTimeout(function() { if (toast.parentElement) toast.remove(); }, 4000);
+}
+
+// ─── Confirmation Modal ──────────────────────────────
+var pendingForm = null;
+function confirmDelete(form, title, body) {
+  pendingForm = form;
+  document.getElementById('confirmTitle').textContent = title || 'Confirm Delete';
+  document.getElementById('confirmBody').textContent = body || 'This action cannot be undone. Are you sure?';
+  document.getElementById('confirmModal').classList.add('active');
+  return false;
+}
+
+function closeModal() {
+  document.getElementById('confirmModal').classList.remove('active');
+  pendingForm = null;
+}
+
+document.getElementById('confirmAction').addEventListener('click', function() {
+  if (pendingForm) pendingForm.submit();
+  closeModal();
+});
+
+// Close modal on overlay click
+document.getElementById('confirmModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Close modal on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ─── Client-side Search/Filter ───────────────────────
+function initTableSearch(inputId, tableId) {
+  var input = document.getElementById(inputId);
+  if (!input) return;
+  input.addEventListener('input', function() {
+    var query = this.value.toLowerCase();
+    var rows = document.querySelectorAll('#' + tableId + ' tbody tr');
+    var visible = 0;
+    rows.forEach(function(row) {
+      var text = row.textContent.toLowerCase();
+      var show = text.indexOf(query) > -1;
+      row.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    var counter = document.getElementById(tableId + '-count');
+    if (counter) counter.textContent = visible;
+  });
+}
+
+// ─── Client-side Column Sort ─────────────────────────
+function initTableSort(tableId) {
+  var table = document.getElementById(tableId);
+  if (!table) return;
+  var headers = table.querySelectorAll('th.sortable');
+  headers.forEach(function(th, idx) {
+    th.addEventListener('click', function() {
+      var asc = !th.classList.contains('sorted-asc');
+      headers.forEach(function(h) { h.classList.remove('sorted', 'sorted-asc', 'sorted-desc'); });
+      th.classList.add('sorted', asc ? 'sorted-asc' : 'sorted-desc');
+      var tbody = table.querySelector('tbody');
+      var rows = Array.from(tbody.querySelectorAll('tr'));
+      rows.sort(function(a, b) {
+        var aVal = (a.cells[idx] ? a.cells[idx].textContent.trim() : '');
+        var bVal = (b.cells[idx] ? b.cells[idx].textContent.trim() : '');
+        var aNum = parseFloat(aVal.replace(/[^0-9.-]/g, ''));
+        var bNum = parseFloat(bVal.replace(/[^0-9.-]/g, ''));
+        if (!isNaN(aNum) && !isNaN(bNum)) return asc ? aNum - bNum : bNum - aNum;
+        return asc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      });
+      rows.forEach(function(row) { tbody.appendChild(row); });
+    });
+  });
+}
+
+// ─── Client-side Pagination ──────────────────────────
+function initPagination(tableId, perPage) {
+  perPage = perPage || 15;
+  var table = document.getElementById(tableId);
+  if (!table) return;
+  var tbody = table.querySelector('tbody');
+  var rows = Array.from(tbody.querySelectorAll('tr'));
+  if (rows.length <= perPage) return;
+
+  var currentPage = 1;
+  var totalPages = Math.ceil(rows.length / perPage);
+  var paginationEl = document.getElementById(tableId + '-pagination');
+  if (!paginationEl) return;
+
+  function render() {
+    rows.forEach(function(row, i) {
+      row.style.display = (i >= (currentPage - 1) * perPage && i < currentPage * perPage) ? '' : 'none';
+    });
+    var info = paginationEl.querySelector('.pagination-info');
+    if (info) info.textContent = 'Showing ' + ((currentPage - 1) * perPage + 1) + '-' + Math.min(currentPage * perPage, rows.length) + ' of ' + rows.length;
+    var btns = paginationEl.querySelector('.pagination-buttons');
+    if (btns) {
+      btns.innerHTML = '';
+      var prevBtn = document.createElement('button');
+      prevBtn.className = 'pagination-btn';
+      prevBtn.textContent = 'Prev';
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.onclick = function() { currentPage--; render(); };
+      btns.appendChild(prevBtn);
+      for (var p = 1; p <= totalPages; p++) {
+        var btn = document.createElement('button');
+        btn.className = 'pagination-btn' + (p === currentPage ? ' active' : '');
+        btn.textContent = p;
+        btn.onclick = (function(pg) { return function() { currentPage = pg; render(); }; })(p);
+        btns.appendChild(btn);
+      }
+      var nextBtn = document.createElement('button');
+      nextBtn.className = 'pagination-btn';
+      nextBtn.textContent = 'Next';
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.onclick = function() { currentPage++; render(); };
+      btns.appendChild(nextBtn);
+    }
+  }
+  render();
+}
+
+// ─── Flash → Toast (convert query param flash messages to toasts)
+(function() {
+  var flash = document.querySelector('.flash--success');
+  if (flash) {
+    showToast(flash.textContent.trim(), 'success');
+    flash.remove();
+  }
+  var flashErr = document.querySelector('.flash--error');
+  if (flashErr) {
+    showToast(flashErr.textContent.trim(), 'error');
+    flashErr.remove();
+  }
+})();
+</script>
 </body>
 </html>

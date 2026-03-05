@@ -1,9 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' — Admin' : 'Admin — MATTAN' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/admin.css">
+  <script>
+    // Restore theme preference
+    (function() {
+      var theme = localStorage.getItem('admin-theme') || '';
+      if (theme) document.documentElement.setAttribute('data-theme', theme);
+      var collapsed = localStorage.getItem('sidebar-collapsed');
+      if (collapsed === 'true') document.documentElement.classList.add('sidebar-collapsed');
+    })();
+  </script>
 </head>
 <body class="admin-body">
+
+<!-- Mobile menu button -->
+<button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Toggle menu">
+  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()"></div>
