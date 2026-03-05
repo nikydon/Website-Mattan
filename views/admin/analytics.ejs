@@ -1,0 +1,114 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<div class="admin-main">
+  <div class="breadcrumbs">
+    <a href="/admin">Dashboard</a>
+    <span class="sep">/</span>
+    <span class="current">Analytics</span>
+  </div>
+
+  <div class="admin-header-row">
+    <h1 class="admin-page-title">Analytics</h1>
+    <div class="filter-group">
+      <button class="btn btn--small btn--primary">7 Days</button>
+      <button class="btn btn--small">30 Days</button>
+      <button class="btn btn--small">90 Days</button>
+      <button class="btn btn--small">Year</button>
+    </div>
+  </div>
+
+  <!-- Summary Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-card-icon green">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <span class="stat-number"><%= counts.orders > 0 ? '$' + (counts.orders * 285).toLocaleString() : '$0' %></span>
+      <span class="stat-label">Total Revenue</span>
+      <span class="stat-trend up">+12.5%</span>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-icon blue">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+      </div>
+      <span class="stat-number"><%= counts.orders %></span>
+      <span class="stat-label">Total Orders</span>
+      <span class="stat-trend up">+8.3%</span>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-icon orange">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      </div>
+      <span class="stat-number"><%= counts.customers %></span>
+      <span class="stat-label">Total Customers</span>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-icon red">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+      </div>
+      <span class="stat-number"><%= counts.items %></span>
+      <span class="stat-label">Active Products</span>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Sales Over Time Chart -->
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3 class="chart-title">Sales Over Time</h3>
+      </div>
+      <div class="chart-area">
+        <% [25,40,35,55,50,70,45,80,60,75,85,65,90,55,70,80,60,95,50,75,85,70,60,90,55,80,65,70].forEach(function(h) { %>
+          <div class="chart-bar" style="height:<%= h %>%"></div>
+        <% }); %>
+      </div>
+      <div class="chart-labels"><span>Week 1</span><span>Week 2</span><span>Week 3</span><span>Week 4</span></div>
+    </div>
+
+    <!-- Traffic Sources -->
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3 class="chart-title">Traffic Sources</h3>
+      </div>
+      <div class="card-body" style="padding:1rem 0">
+        <% var sources = [{name:'Direct',pct:35,color:'var(--admin-accent)'},{name:'Organic Search',pct:28,color:'var(--admin-success)'},{name:'Social Media',pct:22,color:'var(--admin-warning)'},{name:'Referral',pct:10,color:'#8b5cf6'},{name:'Email',pct:5,color:'var(--admin-danger)'}]; %>
+        <% sources.forEach(function(s) { %>
+        <div style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0">
+          <div style="width:8px;height:8px;border-radius:50%;background:<%= s.color %>;flex-shrink:0"></div>
+          <span style="flex:1;font-size:0.85rem"><%= s.name %></span>
+          <div style="width:120px;height:6px;background:var(--admin-bg-alt);border-radius:3px;overflow:hidden">
+            <div style="height:100%;width:<%= s.pct %>%;background:<%= s.color %>;border-radius:3px"></div>
+          </div>
+          <span style="font-size:0.8rem;font-weight:600;width:35px;text-align:right"><%= s.pct %>%</span>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Selling Products -->
+  <div class="card mt-2">
+    <div class="card-header">
+      <h3 class="card-title">Top Selling Products</h3>
+    </div>
+    <div class="card-body--flush">
+      <table class="admin-table" style="border:none">
+        <thead><tr><th>#</th><th>Product</th><th>Collection</th><th>Price</th><th>Stock</th></tr></thead>
+        <tbody>
+          <% topProducts.forEach(function(item, i) { %>
+          <tr>
+            <td><span class="top-product-rank"><%= i + 1 %></span></td>
+            <td><strong><%= item.title %></strong></td>
+            <td class="muted"><%= item.collection ? item.collection.name : '-' %></td>
+            <td><%= item.price || '-' %></td>
+            <td><%= item.stockQty %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

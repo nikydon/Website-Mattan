@@ -2,14 +2,27 @@
 <%- include('partials/nav') %>
 
 <div class="admin-main">
+  <div class="breadcrumbs">
+    <a href="/admin">Dashboard</a>
+    <span class="sep">/</span>
+    <a href="/admin/news">News</a>
+    <span class="sep">/</span>
+    <span class="current"><%= isEdit ? post.title : 'New Post' %></span>
+  </div>
+
   <h1 class="admin-page-title"><%= isEdit ? 'Edit' : 'New' %> Post</h1>
 
   <form method="POST" action="<%= isEdit ? '/admin/news/' + post.id + '/edit' : '/admin/news/new' %>" class="admin-form">
-    <label class="form-label" for="title">Title</label>
-    <input class="form-input" type="text" id="title" name="title" value="<%= isEdit ? post.title : '' %>" required>
-
-    <label class="form-label" for="slug">Slug</label>
-    <input class="form-input" type="text" id="slug" name="slug" value="<%= isEdit ? post.slug : '' %>" required>
+    <div class="form-row">
+      <div>
+        <label class="form-label" for="title">Title</label>
+        <input class="form-input" type="text" id="title" name="title" value="<%= isEdit ? post.title : '' %>" required>
+      </div>
+      <div>
+        <label class="form-label" for="slug">Slug</label>
+        <input class="form-input" type="text" id="slug" name="slug" value="<%= isEdit ? post.slug : '' %>" required>
+      </div>
+    </div>
 
     <label class="form-label" for="body">Body</label>
     <textarea class="form-input form-textarea form-textarea--tall" id="body" name="body" rows="12"><%= isEdit ? post.body : '' %></textarea>
@@ -20,17 +33,17 @@
     </label>
 
     <div class="form-actions">
-      <button class="btn btn--primary" type="submit">Save</button>
+      <button class="btn btn--primary" type="submit">Save Post</button>
       <a href="/admin/news" class="btn">Cancel</a>
     </div>
   </form>
 
   <% if (isEdit) { %>
   <hr class="admin-divider">
-  <h2 class="admin-section-title">Media (Photos &amp; Videos)</h2>
+  <h2 class="admin-section-title">Media (Photos & Videos)</h2>
 
   <div class="image-grid">
-    <% post.images.forEach(img => { %>
+    <% post.images.forEach(function(img) { %>
     <div class="image-card">
       <% if (img.mediaType === 'video') { %>
         <div class="media-thumb media-thumb--video">
@@ -40,11 +53,11 @@
       <% } else { %>
         <img src="/uploads/thumbs/<%= img.filename.replace(/\.\w+$/, '.webp') %>" alt="<%= img.altText || post.title %>">
       <% } %>
-      <form method="POST" action="/admin/news/<%= post.id %>/media/<%= img.id %>/delete" class="image-delete-form">
-        <button type="submit" class="btn btn--danger btn--small" onclick="return confirm('Delete this file?')">Remove</button>
+      <form method="POST" action="/admin/news/<%= post.id %>/media/<%= img.id %>/delete" class="image-delete-form" onsubmit="return confirmDelete(this, 'Remove Media', 'Delete this file?')">
+        <button type="submit" class="btn btn--danger btn--small">Remove</button>
       </form>
     </div>
-    <% }) %>
+    <% }); %>
   </div>
 
   <form method="POST" action="/admin/news/<%= post.id %>/media" enctype="multipart/form-data" class="admin-form upload-form">
@@ -52,7 +65,7 @@
     <input class="form-input" type="file" id="file" name="file" accept="image/*,video/mp4,video/webm,video/quicktime" required>
     <label class="form-label" for="altText">Alt Text / Caption</label>
     <input class="form-input" type="text" id="altText" name="altText" placeholder="Describe the media">
-    <button class="btn btn--primary" type="submit">Upload</button>
+    <button class="btn btn--primary" type="submit" style="margin-top:0.75rem">Upload</button>
   </form>
   <% } %>
 </div>

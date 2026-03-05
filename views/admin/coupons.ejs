@@ -1,0 +1,75 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<div class="admin-main">
+  <div class="breadcrumbs">
+    <a href="/admin">Dashboard</a>
+    <span class="sep">/</span>
+    <span class="current">Coupons</span>
+  </div>
+
+  <div class="admin-header-row">
+    <h1 class="admin-page-title">Coupons & Discounts</h1>
+    <a href="/admin/coupons/new" class="btn btn--primary">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg>
+      New Coupon
+    </a>
+  </div>
+
+  <% if (typeof flash !== 'undefined' && flash) { %>
+    <p class="flash flash--success"><%= flash %></p>
+  <% } %>
+
+  <% if (coupons.length) { %>
+  <table class="admin-table" id="couponTable">
+    <thead>
+      <tr>
+        <th class="sortable">Code <span class="sort-icon">&#8597;</span></th>
+        <th>Discount</th>
+        <th>Type</th>
+        <th class="sortable">Usage <span class="sort-icon">&#8597;</span></th>
+        <th>Expires</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% coupons.forEach(function(c) { %>
+      <tr>
+        <td><strong style="font-family:monospace;letter-spacing:0.05em"><%= c.code %></strong></td>
+        <td><%= c.discount %></td>
+        <td class="muted"><%= c.type === 'percentage' ? 'Percentage' : 'Fixed Amount' %></td>
+        <td><%= c.usageCount %><%= c.usageLimit ? ' / ' + c.usageLimit : '' %></td>
+        <td class="muted">
+          <% if (c.expiresAt) { %>
+            <% var isExpired = new Date(c.expiresAt) < new Date(); %>
+            <span class="<%= isExpired ? 'badge badge--danger' : '' %>"><%= new Date(c.expiresAt).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}) %></span>
+          <% } else { %>
+            Never
+          <% } %>
+        </td>
+        <td><span class="badge badge--<%= c.active ? 'success' : 'neutral' %>"><%= c.active ? 'Active' : 'Inactive' %></span></td>
+        <td class="actions-cell">
+          <div class="btn-group">
+            <a href="/admin/coupons/<%= c.id %>/edit" class="btn btn--small">Edit</a>
+            <form method="POST" action="/admin/coupons/<%= c.id %>/delete" onsubmit="return confirmDelete(this, 'Delete Coupon', 'Are you sure you want to delete this coupon code?')">
+              <button type="submit" class="btn btn--danger btn--small">Delete</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+  <% } else { %>
+  <div class="empty-state">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
+    <h3 class="empty-state-title">No coupons yet</h3>
+    <p class="empty-state-text">Create your first coupon code to offer discounts.</p>
+    <a href="/admin/coupons/new" class="btn btn--primary">Create Coupon</a>
+  </div>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>
+<script>initTableSort('couponTable');</script>

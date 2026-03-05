@@ -14,12 +14,12 @@ router.get('/', async (req, res) => {
     where: { tenantId: tenant.id },
     orderBy: { createdAt: 'desc' },
   });
-  res.render('admin/news', { pageTitle: 'News', posts, flash: req.query.msg });
+  res.render('admin/news', { pageTitle: 'News', activePage: 'news', posts, flash: req.query.msg });
 });
 
 // New form
 router.get('/new', (req, res) => {
-  res.render('admin/news-form', { pageTitle: 'New Post', isEdit: false });
+  res.render('admin/news-form', { pageTitle: 'New Post', activePage: 'news', isEdit: false });
 });
 
 // Create
@@ -45,7 +45,7 @@ router.get('/:id/edit', async (req, res) => {
     include: { images: { orderBy: { sortOrder: 'asc' } } },
   });
   if (!post) return res.redirect('/admin/news');
-  res.render('admin/news-form', { pageTitle: 'Edit Post', isEdit: true, post });
+  res.render('admin/news-form', { pageTitle: 'Edit Post', activePage: 'news', isEdit: true, post });
 });
 
 // Update

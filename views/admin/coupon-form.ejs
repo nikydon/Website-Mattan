@@ -1,0 +1,57 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<div class="admin-main">
+  <div class="breadcrumbs">
+    <a href="/admin">Dashboard</a>
+    <span class="sep">/</span>
+    <a href="/admin/coupons">Coupons</a>
+    <span class="sep">/</span>
+    <span class="current"><%= isEdit ? coupon.code : 'New Coupon' %></span>
+  </div>
+
+  <h1 class="admin-page-title"><%= isEdit ? 'Edit' : 'New' %> Coupon</h1>
+
+  <form method="POST" action="<%= isEdit ? '/admin/coupons/' + coupon.id + '/edit' : '/admin/coupons/new' %>" class="admin-form">
+    <div class="form-row">
+      <div>
+        <label class="form-label" for="code">Coupon Code</label>
+        <input class="form-input" type="text" id="code" name="code" value="<%= isEdit ? coupon.code : '' %>" required placeholder="e.g. SUMMER20" style="text-transform:uppercase;font-family:monospace">
+      </div>
+      <div>
+        <label class="form-label" for="type">Discount Type</label>
+        <select class="form-input" id="type" name="type">
+          <option value="percentage" <%= isEdit && coupon.type === 'percentage' ? 'selected' : '' %>>Percentage (%)</option>
+          <option value="fixed" <%= isEdit && coupon.type === 'fixed' ? 'selected' : '' %>>Fixed Amount</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div>
+        <label class="form-label" for="discount">Discount Value</label>
+        <input class="form-input" type="text" id="discount" name="discount" value="<%= isEdit ? coupon.discount : '' %>" required placeholder="e.g. 20% or 50">
+      </div>
+      <div>
+        <label class="form-label" for="usageLimit">Usage Limit</label>
+        <input class="form-input" type="number" id="usageLimit" name="usageLimit" value="<%= isEdit && coupon.usageLimit ? coupon.usageLimit : '' %>" placeholder="Leave empty for unlimited" min="0">
+      </div>
+    </div>
+
+    <label class="form-label" for="expiresAt">Expiry Date</label>
+    <input class="form-input" type="date" id="expiresAt" name="expiresAt" value="<%= isEdit && coupon.expiresAt ? new Date(coupon.expiresAt).toISOString().split('T')[0] : '' %>" style="max-width:250px">
+    <span class="form-hint">Leave empty for no expiry</span>
+
+    <label class="form-checkbox">
+      <input type="checkbox" name="active" value="true" <%= (!isEdit || coupon.active) ? 'checked' : '' %>>
+      Active
+    </label>
+
+    <div class="form-actions">
+      <button class="btn btn--primary" type="submit">Save Coupon</button>
+      <a href="/admin/coupons" class="btn">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<%- include('partials/footer') %>

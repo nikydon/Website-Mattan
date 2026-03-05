@@ -2,34 +2,64 @@
 <%- include('partials/nav') %>
 
 <div class="admin-main">
-  <h1 class="admin-page-title"><%= isEdit ? 'Edit' : 'New' %> Catalog Item</h1>
+  <div class="breadcrumbs">
+    <a href="/admin">Dashboard</a>
+    <span class="sep">/</span>
+    <a href="/admin/items">Products</a>
+    <span class="sep">/</span>
+    <span class="current"><%= isEdit ? item.title : 'New Product' %></span>
+  </div>
+
+  <h1 class="admin-page-title"><%= isEdit ? 'Edit' : 'New' %> Product</h1>
 
   <form method="POST" action="<%= isEdit ? '/admin/items/' + item.id + '/edit' : '/admin/items/new' %>" class="admin-form">
-    <label class="form-label" for="title">Title</label>
-    <input class="form-input" type="text" id="title" name="title" value="<%= isEdit ? item.title : '' %>" required>
-
-    <label class="form-label" for="slug">Slug</label>
-    <input class="form-input" type="text" id="slug" name="slug" value="<%= isEdit ? item.slug : '' %>" required>
+    <div class="form-row">
+      <div>
+        <label class="form-label" for="title">Title</label>
+        <input class="form-input" type="text" id="title" name="title" value="<%= isEdit ? item.title : '' %>" required>
+      </div>
+      <div>
+        <label class="form-label" for="slug">Slug</label>
+        <input class="form-input" type="text" id="slug" name="slug" value="<%= isEdit ? item.slug : '' %>" required>
+      </div>
+    </div>
 
     <label class="form-label" for="collectionId">Collection</label>
     <select class="form-input" id="collectionId" name="collectionId">
-      <option value="">— None —</option>
-      <% collections.forEach(col => { %>
+      <option value="">- None -</option>
+      <% collections.forEach(function(col) { %>
         <option value="<%= col.id %>" <%= isEdit && item.collectionId === col.id ? 'selected' : '' %>><%= col.name %></option>
-      <% }) %>
+      <% }); %>
     </select>
 
     <label class="form-label" for="description">Description</label>
     <textarea class="form-input form-textarea" id="description" name="description" rows="3"><%= isEdit && item.description ? item.description : '' %></textarea>
 
-    <label class="form-label" for="price">Price</label>
-    <input class="form-input" type="text" id="price" name="price" value="<%= isEdit && item.price ? item.price : '' %>" placeholder="e.g. €320">
+    <div class="form-row">
+      <div>
+        <label class="form-label" for="price">Price</label>
+        <input class="form-input" type="text" id="price" name="price" value="<%= isEdit && item.price ? item.price : '' %>" placeholder="e.g. 320">
+      </div>
+      <div>
+        <label class="form-label" for="stockQty">Stock Quantity</label>
+        <input class="form-input" type="number" id="stockQty" name="stockQty" value="<%= isEdit ? item.stockQty : 0 %>" min="0">
+      </div>
+    </div>
 
-    <label class="form-label" for="materials">Materials</label>
-    <input class="form-input" type="text" id="materials" name="materials" value="<%= isEdit && item.materials ? item.materials : '' %>">
+    <div class="form-row">
+      <div>
+        <label class="form-label" for="materials">Materials</label>
+        <input class="form-input" type="text" id="materials" name="materials" value="<%= isEdit && item.materials ? item.materials : '' %>">
+      </div>
+      <div>
+        <label class="form-label" for="tags">Tags</label>
+        <input class="form-input" type="text" id="tags" name="tags" value="<%= isEdit && item.tags ? item.tags : '' %>" placeholder="gold, ring, minimal">
+        <span class="form-hint">Comma-separated</span>
+      </div>
+    </div>
 
     <label class="form-label" for="sortOrder">Sort Order</label>
-    <input class="form-input" type="number" id="sortOrder" name="sortOrder" value="<%= isEdit ? item.sortOrder : 0 %>">
+    <input class="form-input" type="number" id="sortOrder" name="sortOrder" value="<%= isEdit ? item.sortOrder : 0 %>" style="max-width:120px">
 
     <label class="form-checkbox">
       <input type="checkbox" name="published" value="true" <%= isEdit && item.published ? 'checked' : '' %>>
@@ -37,17 +67,17 @@
     </label>
 
     <div class="form-actions">
-      <button class="btn btn--primary" type="submit">Save</button>
+      <button class="btn btn--primary" type="submit">Save Product</button>
       <a href="/admin/items" class="btn">Cancel</a>
     </div>
   </form>
 
   <% if (isEdit) { %>
   <hr class="admin-divider">
-  <h2 class="admin-section-title">Media (Photos &amp; Videos)</h2>
+  <h2 class="admin-section-title">Media (Photos & Videos)</h2>
 
   <div class="image-grid">
-    <% item.images.forEach(img => { %>
+    <% item.images.forEach(function(img) { %>
     <div class="image-card">
       <% if (img.mediaType === 'video') { %>
         <div class="media-thumb media-thumb--video">
@@ -57,11 +87,11 @@
       <% } else { %>
         <img src="/uploads/thumbs/<%= img.filename.replace(/\.\w+$/, '.webp') %>" alt="<%= img.altText || item.title %>">
       <% } %>
-      <form method="POST" action="/admin/items/<%= item.id %>/images/<%= img.id %>/delete" class="image-delete-form">
-        <button type="submit" class="btn btn--danger btn--small" onclick="return confirm('Delete this file?')">Remove</button>
+      <form method="POST" action="/admin/items/<%= item.id %>/images/<%= img.id %>/delete" class="image-delete-form" onsubmit="return confirmDelete(this, 'Remove Media', 'Delete this file?')">
+        <button type="submit" class="btn btn--danger btn--small">Remove</button>
       </form>
     </div>
-    <% }) %>
+    <% }); %>
   </div>
 
   <form method="POST" action="/admin/items/<%= item.id %>/images" enctype="multipart/form-data" class="admin-form upload-form">
@@ -69,7 +99,7 @@
     <input class="form-input" type="file" id="file" name="file" accept="image/*,video/mp4,video/webm,video/quicktime" required>
     <label class="form-label" for="altText">Alt Text / Caption</label>
     <input class="form-input" type="text" id="altText" name="altText" placeholder="Describe the media">
-    <button class="btn btn--primary" type="submit">Upload</button>
+    <button class="btn btn--primary" type="submit" style="margin-top:0.75rem">Upload</button>
   </form>
   <% } %>
 </div>

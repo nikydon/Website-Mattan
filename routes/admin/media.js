@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
     orderBy: { createdAt: 'desc' },
     include: { catalogItem: true, newsPost: true },
   });
-  res.render('admin/media', { pageTitle: 'Media Library', media, flash: req.query.msg, filter: filter || 'all' });
+  res.render('admin/media', { pageTitle: 'Media Library', activePage: 'media', media, flash: req.query.msg, filter: filter || 'all' });
 });
 
 // Upload standalone media
