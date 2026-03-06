@@ -18,7 +18,7 @@
         <p class="card-desc"><%= item.collection.name %></p>
       <% } %>
       <% if (item.price) { %>
-        <p class="card-price">$<%= item.price.toFixed(2) %></p>
+        <p class="card-price">$<%= parseFloat(item.price).toFixed(2) %></p>
       <% } %>
     </a>
     <% }); %>
