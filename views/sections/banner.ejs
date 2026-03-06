@@ -1,0 +1,21 @@
+<%
+  var c = (typeof sectionContent !== 'undefined' && sectionContent['banner']) || {};
+  var heading = c.heading || '';
+  var subtitle = c.subtitle || '';
+  var imageUrl = c.imageUrl || '';
+  var linkUrl = c.linkUrl || '';
+  var linkText = c.linkText || 'Learn More';
+%>
+<section class="banner-section" <% if (imageUrl) { %>style="background-image: url('<%= imageUrl %>')"<% } %>>
+  <div class="banner-overlay">
+    <% if (heading) { %>
+      <h2 class="banner-heading"><%= heading %></h2>
+    <% } %>
+    <% if (subtitle) { %>
+      <p class="banner-subtitle"><%= subtitle %></p>
+    <% } %>
+    <% if (linkUrl) { %>
+      <a href="<%= linkUrl %>" class="banner-link"><%= linkText %></a>
+    <% } %>
+  </div>
+</section>

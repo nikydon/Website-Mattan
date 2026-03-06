@@ -1,0 +1,20 @@
+<%
+  var c = (typeof sectionContent !== 'undefined' && sectionContent['news-feed']) || {};
+  var heading = c.heading || 'Latest News';
+%>
+<% if (typeof recentPosts !== 'undefined' && recentPosts.length) { %>
+<section class="section news-feed-section">
+  <h2 class="section-title"><%= heading %></h2>
+  <div class="grid grid-3">
+    <% recentPosts.forEach(function(post) { %>
+    <a href="/news/<%= post.slug %>" class="news-feed-card">
+      <span class="news-date"><%= post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '' %></span>
+      <h3 class="news-title"><%= post.title %></h3>
+      <% if (post.excerpt) { %>
+        <p class="news-excerpt"><%= post.excerpt %></p>
+      <% } %>
+    </a>
+    <% }); %>
+  </div>
+</section>
+<% } %>

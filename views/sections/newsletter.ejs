@@ -1,0 +1,16 @@
+<%
+  var c = (typeof sectionContent !== 'undefined' && sectionContent['newsletter']) || {};
+  var heading = c.heading || 'Stay in Touch';
+  var description = c.description || 'Subscribe to receive updates on new collections and exclusive offers.';
+  var buttonText = c.buttonText || 'Subscribe';
+%>
+<section class="section newsletter-section">
+  <div class="newsletter-inner">
+    <h2 class="section-title"><%= heading %></h2>
+    <p class="newsletter-desc"><%= description %></p>
+    <form class="newsletter-form" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Subscribed!'; this.querySelector('input').value='';">
+      <input type="email" placeholder="Enter your email" class="newsletter-input" required>
+      <button type="submit" class="newsletter-btn"><%= buttonText %></button>
+    </form>
+  </div>
+</section>

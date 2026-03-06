@@ -1,0 +1,13 @@
+<%
+  var c = (typeof sectionContent !== 'undefined' && sectionContent['text-block']) || {};
+  var heading = c.heading || '';
+  var body = c.body || '';
+%>
+<section class="section text-block-section">
+  <% if (heading) { %>
+    <h2 class="section-title"><%= heading %></h2>
+  <% } %>
+  <% if (body) { %>
+    <div class="text-block-body"><%- body.replace(/\n/g, '<br>') %></div>
+  <% } %>
+</section>

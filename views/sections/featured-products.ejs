@@ -1,0 +1,27 @@
+<%
+  var c = (typeof sectionContent !== 'undefined' && sectionContent['featured-products']) || {};
+  var heading = c.heading || 'Featured Pieces';
+%>
+<% if (typeof featuredProducts !== 'undefined' && featuredProducts.length) { %>
+<section class="section featured-products">
+  <h2 class="section-title"><%= heading %></h2>
+  <div class="grid grid-4">
+    <% featuredProducts.forEach(function(item) { %>
+    <a href="/pieces/<%= item.slug %>" class="card">
+      <% if (item.images.length) { %>
+        <div class="card-img" style="background-image: url('/uploads/thumbs/<%= item.images[0].filename.replace(/\.\w+$/, '.webp') %>')"></div>
+      <% } else { %>
+        <div class="card-img card-img--empty"></div>
+      <% } %>
+      <h3 class="card-title"><%= item.title %></h3>
+      <% if (item.collection) { %>
+        <p class="card-desc"><%= item.collection.name %></p>
+      <% } %>
+      <% if (item.price) { %>
+        <p class="card-price">$<%= item.price.toFixed(2) %></p>
+      <% } %>
+    </a>
+    <% }); %>
+  </div>
+</section>
+<% } %>
