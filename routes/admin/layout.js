@@ -158,7 +158,8 @@ router.post('/discard-draft', express.json(), async (req, res) => {
 });
 
 // Live preview endpoint — renders the homepage with provided data (POST body)
-router.post('/preview', express.json(), async (req, res) => {
+router.post('/preview', express.json(), async (req, res, next) => {
+  try {
   const tenant = await getDefaultTenant();
   const settings = await loadSettings(tenant.id);
   const { sections, content, styles, visibility } = req.body;
@@ -200,6 +201,9 @@ router.post('/preview', express.json(), async (req, res) => {
     featuredProducts,
     recentPosts,
   });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Keep backward compat
