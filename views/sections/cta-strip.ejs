@@ -1,0 +1,16 @@
+<%
+  var c = (typeof sectionContent !== 'undefined' && sectionContent['cta-strip']) || {};
+  var heading = c.heading || 'Ready to explore?';
+  var subtitle = c.subtitle || '';
+  var ctaText = c.ctaText || 'Shop Now';
+  var ctaLink = c.ctaLink || '/collections';
+%>
+<section class="cta-strip-section">
+  <div class="cta-strip-inner">
+    <div class="cta-strip-text">
+      <h2 class="cta-strip-heading"><%= heading %></h2>
+      <% if (subtitle) { %><p class="cta-strip-subtitle"><%= subtitle %></p><% } %>
+    </div>
+    <a href="<%= ctaLink %>" class="hero-cta"><%= ctaText %></a>
+  </div>
+</section>

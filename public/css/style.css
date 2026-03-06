@@ -542,6 +542,313 @@ img {
   text-align: center;
 }
 
+/* ─── Testimonials ─────────────────────────────────── */
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap);
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.testimonial-card {
+  padding: 2rem;
+  border: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.testimonial-quote {
+  font-style: italic;
+  color: var(--color-muted);
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+
+.testimonial-author strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.testimonial-author span {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+/* ─── FAQ ──────────────────────────────────────────── */
+.faq-list {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--color-border);
+  padding: 1.25rem 0;
+}
+
+.faq-question {
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: normal;
+  letter-spacing: 0.02em;
+  list-style: none;
+}
+
+.faq-question::-webkit-details-marker { display: none; }
+.faq-question::marker { display: none; content: ''; }
+
+.faq-question::before {
+  content: '+';
+  display: inline-block;
+  width: 1.5rem;
+  color: var(--color-muted);
+  transition: transform 0.2s;
+}
+
+details[open] .faq-question::before {
+  content: '\2212';
+}
+
+.faq-answer {
+  padding: 1rem 0 0 1.5rem;
+  color: var(--color-muted);
+  line-height: 1.8;
+}
+
+/* ─── Gallery ──────────────────────────────────────── */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.gallery-item img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.gallery-item--placeholder {
+  aspect-ratio: 1;
+  background: var(--color-card-bg);
+}
+
+/* ─── Video ────────────────────────────────────────── */
+.video-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+}
+
+.video-iframe, .video-native {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.video-placeholder {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-card-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+.video-caption {
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  margin-top: 1rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ─── Countdown ────────────────────────────────────── */
+.countdown-section {
+  text-align: center;
+  padding: 6rem var(--gap);
+}
+
+.countdown-heading {
+  font-size: 2rem;
+  font-weight: normal;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.countdown-subtitle {
+  color: var(--color-muted);
+  margin-bottom: 2.5rem;
+}
+
+.countdown-timer {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.countdown-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.countdown-num {
+  font-size: 3rem;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  line-height: 1;
+}
+
+.countdown-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-muted);
+  margin-top: 0.5rem;
+}
+
+/* ─── Social Feed ──────────────────────────────────── */
+.social-links-row {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.social-link-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  border: 1px solid var(--color-border);
+  transition: border-color 0.2s;
+}
+
+.social-link-card:hover {
+  border-color: var(--color-text);
+}
+
+.social-link-card svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* ─── Divider ──────────────────────────────────────── */
+.divider-section {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding-left: var(--gap);
+  padding-right: var(--gap);
+}
+
+.divider-line {
+  border: none;
+  border-top: 1px solid var(--color-border);
+}
+
+.divider-dots {
+  text-align: center;
+  color: var(--color-muted);
+  letter-spacing: 0.5em;
+  font-size: 1.25rem;
+}
+
+.divider-space {
+  height: 1px;
+}
+
+/* ─── Features Grid ────────────────────────────────── */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gap);
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.feature-card {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.feature-title {
+  font-size: 0.9rem;
+  font-weight: normal;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.feature-desc {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  line-height: 1.7;
+}
+
+/* ─── CTA Strip ────────────────────────────────────── */
+.cta-strip-section {
+  background: var(--color-card-bg);
+  padding: 3rem var(--gap);
+}
+
+.cta-strip-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.cta-strip-heading {
+  font-size: 1.5rem;
+  font-weight: normal;
+  letter-spacing: 0.1em;
+}
+
+.cta-strip-subtitle {
+  color: var(--color-muted);
+  margin-top: 0.25rem;
+}
+
+/* ─── Logo Bar ─────────────────────────────────────── */
+.logo-bar-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.logo-bar-item img {
+  max-height: 40px;
+  width: auto;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.logo-bar-item img:hover { opacity: 1; }
+
+.logo-bar-empty {
+  color: var(--color-muted);
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
 @media (max-width: 900px) {
   .brand-story-content {
     grid-template-columns: 1fr;
@@ -550,6 +857,41 @@ img {
 
   .newsletter-form {
     flex-direction: column;
+  }
+
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cta-strip-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .countdown-timer {
+    gap: 1rem;
+  }
+
+  .countdown-num {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 550px) {
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
   }
 }
 

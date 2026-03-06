@@ -1,0 +1,33 @@
+<%
+  var c = (typeof sectionContent !== 'undefined' && sectionContent['video']) || {};
+  var heading = c.heading || '';
+  var videoUrl = c.videoUrl || '';
+  var caption = c.caption || '';
+%>
+<section class="section video-section">
+  <% if (heading) { %>
+    <h2 class="section-title"><%= heading %></h2>
+  <% } %>
+  <div class="video-wrapper">
+    <% if (videoUrl) { %>
+      <% if (videoUrl.indexOf('youtube') !== -1 || videoUrl.indexOf('youtu.be') !== -1) { %>
+        <% var vid = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/); %>
+        <% if (vid) { %>
+          <iframe src="https://www.youtube.com/embed/<%= vid[1] %>" frameborder="0" allowfullscreen class="video-iframe"></iframe>
+        <% } %>
+      <% } else if (videoUrl.indexOf('vimeo') !== -1) { %>
+        <% var vmatch = videoUrl.match(/vimeo\.com\/(\d+)/); %>
+        <% if (vmatch) { %>
+          <iframe src="https://player.vimeo.com/video/<%= vmatch[1] %>" frameborder="0" allowfullscreen class="video-iframe"></iframe>
+        <% } %>
+      <% } else { %>
+        <video src="<%= videoUrl %>" controls class="video-native"></video>
+      <% } %>
+    <% } else { %>
+      <div class="video-placeholder">Add a video URL to display here</div>
+    <% } %>
+  </div>
+  <% if (caption) { %>
+    <p class="video-caption"><%= caption %></p>
+  <% } %>
+</section>

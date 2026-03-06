@@ -1,0 +1,24 @@
+<%
+  var c = (typeof sectionContent !== 'undefined' && sectionContent['faq']) || {};
+  var heading = c.heading || 'Frequently Asked Questions';
+  var items = [];
+  try { items = c.items ? JSON.parse(c.items) : []; } catch(e) {}
+  if (!items.length) {
+    items = [
+      { question: 'What materials do you use?', answer: 'We source only the finest materials, ensuring each piece meets our exacting standards.' },
+      { question: 'Do you offer international shipping?', answer: 'Yes, we ship worldwide. Shipping costs are calculated at checkout based on your location.' },
+      { question: 'What is your return policy?', answer: 'We accept returns within 30 days of delivery. Items must be in original condition.' }
+    ];
+  }
+%>
+<section class="section faq-section">
+  <h2 class="section-title"><%= heading %></h2>
+  <div class="faq-list">
+    <% items.forEach(function(item, i) { %>
+    <details class="faq-item">
+      <summary class="faq-question"><%= item.question %></summary>
+      <p class="faq-answer"><%= item.answer %></p>
+    </details>
+    <% }); %>
+  </div>
+</section>

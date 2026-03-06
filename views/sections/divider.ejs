@@ -1,0 +1,14 @@
+<%
+  var c = (typeof sectionContent !== 'undefined' && sectionContent['divider']) || {};
+  var style = c.style || 'line';
+  var spacing = c.spacing || '3';
+%>
+<div class="divider-section" style="padding: <%= spacing %>rem 0;">
+  <% if (style === 'line') { %>
+    <hr class="divider-line">
+  <% } else if (style === 'dots') { %>
+    <div class="divider-dots">&bull; &bull; &bull;</div>
+  <% } else { %>
+    <div class="divider-space"></div>
+  <% } %>
+</div>
