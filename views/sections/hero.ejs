@@ -1,0 +1,12 @@
+<%
+  var c = (typeof sectionContent !== 'undefined' && sectionContent['hero']) || {};
+  var heading = c.heading || settings.brand_name || 'MATTAN';
+  var tagline = c.tagline || settings.tagline || '';
+  var ctaText = c.ctaText || 'View Collections';
+  var ctaLink = c.ctaLink || '/collections';
+%>
+<section class="hero">
+  <h1 class="hero-title"><%= heading %></h1>
+  <p class="hero-tagline"><%= tagline %></p>
+  <a href="<%= ctaLink %>" class="hero-cta"><%= ctaText %></a>
+</section>

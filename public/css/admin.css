@@ -1025,6 +1025,25 @@ img { max-width: 100%; }
   transition: color var(--transition);
 }
 
+.layout-section-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.layout-section-edit {
+  background: none;
+  border: none;
+  color: var(--admin-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.2rem;
+  transition: color var(--transition);
+}
+
+.layout-section-edit svg { width: 16px; height: 16px; }
+.layout-section-edit:hover { color: var(--admin-accent); }
+
 .layout-section-remove:hover { color: var(--admin-danger); }
 
 .layout-section-preview {
@@ -1033,7 +1052,57 @@ img { max-width: 100%; }
   font-size: 0.75rem;
   color: var(--admin-muted);
   background: var(--admin-card);
-  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+.layout-section-fields {
+  display: none;
+  padding: 1rem;
+  border-top: 1px solid var(--admin-border-light);
+  background: var(--admin-bg);
+}
+
+.layout-section-fields.expanded {
+  display: block;
+}
+
+.layout-field {
+  margin-bottom: 0.75rem;
+}
+
+.layout-field:last-child {
+  margin-bottom: 0;
+}
+
+.layout-field-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--admin-text-secondary);
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.layout-field-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-sm);
+  background: var(--admin-card);
+  color: var(--admin-text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  transition: border-color var(--transition);
+}
+
+.layout-field-input:focus {
+  outline: none;
+  border-color: var(--admin-accent);
+}
+
+textarea.layout-field-input {
+  resize: vertical;
+  min-height: 60px;
 }
 
 /* ─── Dark Mode Toggle ──────────────────────────────── */

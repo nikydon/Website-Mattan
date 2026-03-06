@@ -1,0 +1,23 @@
+<%
+  var c = (typeof sectionContent !== 'undefined' && sectionContent['brand-story']) || {};
+  var heading = c.heading || 'Our Story';
+  var body = c.body || (typeof settings !== 'undefined' && settings.brand_story ? settings.brand_story : '');
+  var imageUrl = c.imageUrl || '';
+%>
+<% if (heading || body) { %>
+<section class="section brand-story-section">
+  <h2 class="section-title"><%= heading %></h2>
+  <div class="brand-story-content">
+    <div class="brand-story-text">
+      <% if (body) { %>
+        <p><%- body.replace(/\n/g, '<br>') %></p>
+      <% } %>
+    </div>
+    <% if (imageUrl) { %>
+      <div class="brand-story-image">
+        <img src="<%= imageUrl %>" alt="<%= heading %>">
+      </div>
+    <% } %>
+  </div>
+</section>
+<% } %>

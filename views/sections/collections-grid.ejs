@@ -1,0 +1,22 @@
+<%
+  var c = (typeof sectionContent !== 'undefined' && sectionContent['collections-grid']) || {};
+  var heading = c.heading || 'Collections';
+%>
+<% if (typeof collections !== 'undefined' && collections.length) { %>
+<section class="section collections-preview">
+  <h2 class="section-title"><%= heading %></h2>
+  <div class="grid grid-4">
+    <% collections.forEach(function(col) { %>
+    <a href="/collections/<%= col.slug %>" class="card">
+      <% if (col.catalogItems.length && col.catalogItems[0].images.length) { %>
+        <div class="card-img" style="background-image: url('/uploads/thumbs/<%= col.catalogItems[0].images[0].filename.replace(/\.\w+$/, '.webp') %>')"></div>
+      <% } else { %>
+        <div class="card-img card-img--empty"></div>
+      <% } %>
+      <h3 class="card-title"><%= col.name %></h3>
+      <p class="card-count"><%= col._count.catalogItems %> piece<%= col._count.catalogItems !== 1 ? 's' : '' %></p>
+    </a>
+    <% }); %>
+  </div>
+</section>
+<% } %>

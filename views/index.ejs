@@ -2,30 +2,12 @@
 <%- include('partials/nav') %>
 
 <main>
-  <section class="hero">
-    <h1 class="hero-title">MATTAN</h1>
-    <p class="hero-tagline"><%= settings.tagline || '' %></p>
-    <a href="/collections" class="hero-cta">View Collections</a>
-  </section>
-
-  <% if (collections.length) { %>
-  <section class="section collections-preview">
-    <h2 class="section-title">Collections</h2>
-    <div class="grid grid-4">
-      <% collections.forEach(col => { %>
-      <a href="/collections/<%= col.slug %>" class="card">
-        <% if (col.catalogItems.length && col.catalogItems[0].images.length) { %>
-          <div class="card-img" style="background-image: url('/uploads/thumbs/<%= col.catalogItems[0].images[0].filename.replace(/\.\w+$/, '.webp') %>')"></div>
-        <% } else { %>
-          <div class="card-img card-img--empty"></div>
-        <% } %>
-        <h3 class="card-title"><%= col.name %></h3>
-        <p class="card-count"><%= col._count.catalogItems %> piece<%= col._count.catalogItems !== 1 ? 's' : '' %></p>
-      </a>
-      <% }) %>
-    </div>
-  </section>
-  <% } %>
+  <% var validSections = ['hero', 'featured-products', 'collections-grid', 'banner', 'text-block', 'newsletter', 'news-feed', 'brand-story']; %>
+  <% layoutSections.forEach(function(section) { %>
+    <% if (validSections.indexOf(section) !== -1) { %>
+      <%- include('sections/' + section) %>
+    <% } %>
+  <% }); %>
 </main>
 
 <%- include('partials/footer') %>

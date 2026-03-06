@@ -13,21 +13,45 @@ router.get('/', wrap(async (req, res) => {
   if (!tenant) return res.status(503).send('Site is starting up — please refresh in a moment.');
   const settings = await loadSettings(tenant.id);
 
-  const collections = await prisma.collection.findMany({
-    where: { tenantId: tenant.id, published: true },
-    orderBy: { sortOrder: 'asc' },
-    include: {
-      catalogItems: {
-        where: { published: true },
-        orderBy: { sortOrder: 'asc' },
-        take: 1,
-        include: { images: { orderBy: { sortOrder: 'asc' }, take: 1 } },
-      },
-      _count: { select: { catalogItems: true } },
-    },
-  });
+  // Load layout config
+  const DEFAULT_SECTIONS = ['hero', 'collections-grid', 'brand-story', 'newsletter'];
+  let layoutSections = DEFAULT_SECTIONS;
+  if (settings.layout_sections) {
+    try { layoutSections = JSON.parse(settings.layout_sections); } catch (e) { /* fallback */ }
+  }
+  let sectionContent = {};
+  if (settings.layout_content) {
+    try { sectionContent = JSON.parse(settings.layout_content); } catch (e) { /* fallback */ }
+  }
 
-  res.render('index', { settings, collections });
+  const [collections, featuredProducts, recentPosts] = await Promise.all([
+    prisma.collection.findMany({
+      where: { tenantId: tenant.id, published: true },
+      orderBy: { sortOrder: 'asc' },
+      include: {
+        catalogItems: {
+          where: { published: true },
+          orderBy: { sortOrder: 'asc' },
+          take: 1,
+          include: { images: { orderBy: { sortOrder: 'asc' }, take: 1 } },
+        },
+        _count: { select: { catalogItems: true } },
+      },
+    }),
+    prisma.catalogItem.findMany({
+      where: { tenantId: tenant.id, published: true },
+      orderBy: { sortOrder: 'asc' },
+      take: 8,
+      include: { images: { orderBy: { sortOrder: 'asc' }, take: 1 }, collection: true },
+    }),
+    prisma.newsPost.findMany({
+      where: { tenantId: tenant.id, publishedAt: { not: null } },
+      orderBy: { publishedAt: 'desc' },
+      take: 3,
+    }),
+  ]);
+
+  res.render('index', { settings, layoutSections, sectionContent, collections, featuredProducts, recentPosts });
 }));
 
 // ─── Collections listing ─────────────────────────────
