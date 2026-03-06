@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview — MATTAN</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* Inject custom section styles */
+    <% var validSections = ['hero', 'featured-products', 'collections-grid', 'banner', 'text-block', 'newsletter', 'news-feed', 'brand-story', 'testimonials', 'faq', 'gallery', 'video', 'countdown', 'social-feed', 'divider', 'features-grid', 'cta-strip', 'logo-bar']; %>
+    <% layoutSections.forEach(function(section, idx) { %>
+      <% var vis = (typeof sectionVisibility !== 'undefined' && sectionVisibility[section + '-' + idx]) || {}; %>
+      <% var st = (typeof sectionStyles !== 'undefined' && sectionStyles[section + '-' + idx]) || {}; %>
+      <% if (vis.hidden) { %>
+        [data-section-idx="<%= idx %>"] { display: none !important; }
+      <% } %>
+      <% if (st.bgColor || st.textColor || st.paddingTop || st.paddingBottom || st.fontSize || st.fontFamily || st.bgImage) { %>
+        [data-section-idx="<%= idx %>"] {
+          <% if (st.bgColor) { %>background-color: <%= st.bgColor %> !important;<% } %>
+          <% if (st.textColor) { %>color: <%= st.textColor %> !important;<% } %>
+          <% if (st.paddingTop) { %>padding-top: <%= st.paddingTop %>px !important;<% } %>
+          <% if (st.paddingBottom) { %>padding-bottom: <%= st.paddingBottom %>px !important;<% } %>
+          <% if (st.fontSize) { %>font-size: <%= st.fontSize %>px !important;<% } %>
+          <% if (st.fontFamily) { %>font-family: '<%= st.fontFamily %>', sans-serif !important;<% } %>
+          <% if (st.bgImage) { %>background-image: url('<%= st.bgImage %>') !important; background-size: cover; background-position: center;<% } %>
+        }
+      <% } %>
+    <% }); %>
+  </style>
+</head>
+<body>
+<%- include('partials/nav') %>
+
+<main>
+  <% layoutSections.forEach(function(section, idx) { %>
+    <% if (validSections.indexOf(section) !== -1) { %>
+      <div data-section-idx="<%= idx %>">
+        <%- include('sections/' + section) %>
+      </div>
+    <% } %>
+  <% }); %>
+</main>
+
+<%- include('partials/footer') %>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<%
+  var c = (typeof sectionContent !== 'undefined' && sectionContent['testimonials']) || {};
+  var heading = c.heading || 'What Our Customers Say';
+  var items = [];
+  try { items = c.items ? JSON.parse(c.items) : []; } catch(e) {}
+  if (!items.length) {
+    items = [
+      { quote: 'Exceptional quality and craftsmanship. Truly one of a kind.', author: 'Sarah M.', role: 'Interior Designer' },
+      { quote: 'The attention to detail is remarkable. I could not be happier with my purchase.', author: 'James L.', role: 'Art Collector' },
+      { quote: 'A beautiful addition to our home. The piece exceeded all expectations.', author: 'Emily R.', role: 'Homeowner' }
+    ];
+  }
+%>
+<section class="section testimonials-section">
+  <h2 class="section-title"><%= heading %></h2>
+  <div class="testimonials-grid">
+    <% items.forEach(function(item) { %>
+    <div class="testimonial-card">
+      <p class="testimonial-quote">&ldquo;<%= item.quote %>&rdquo;</p>
+      <div class="testimonial-author">
+        <strong><%= item.author %></strong>
+        <% if (item.role) { %><span><%= item.role %></span><% } %>
+      </div>
+    </div>
+    <% }); %>
+  </div>
+</section>

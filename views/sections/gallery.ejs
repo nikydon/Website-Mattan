@@ -1,0 +1,29 @@
+<%
+  var c = (typeof sectionContent !== 'undefined' && sectionContent['gallery']) || {};
+  var heading = c.heading || 'Gallery';
+  var images = [];
+  try { images = c.images ? JSON.parse(c.images) : []; } catch(e) {}
+%>
+<section class="section gallery-section">
+  <% if (heading) { %>
+    <h2 class="section-title"><%= heading %></h2>
+  <% } %>
+  <% if (images.length) { %>
+  <div class="gallery-grid">
+    <% images.forEach(function(img) { %>
+    <div class="gallery-item">
+      <img src="<%= img.url || img %>" alt="<%= img.alt || '' %>" loading="lazy">
+    </div>
+    <% }); %>
+  </div>
+  <% } else { %>
+  <div class="gallery-grid">
+    <div class="gallery-item gallery-item--placeholder"></div>
+    <div class="gallery-item gallery-item--placeholder"></div>
+    <div class="gallery-item gallery-item--placeholder"></div>
+    <div class="gallery-item gallery-item--placeholder"></div>
+    <div class="gallery-item gallery-item--placeholder"></div>
+    <div class="gallery-item gallery-item--placeholder"></div>
+  </div>
+  <% } %>
+</section>

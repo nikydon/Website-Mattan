@@ -1,0 +1,23 @@
+<%
+  var c = (typeof sectionContent !== 'undefined' && sectionContent['social-feed']) || {};
+  var heading = c.heading || 'Follow Us';
+  var instagramHandle = c.instagramHandle || (typeof settings !== 'undefined' && settings.social_instagram ? settings.social_instagram : '');
+  var tiktokHandle = c.tiktokHandle || (typeof settings !== 'undefined' && settings.social_tiktok ? settings.social_tiktok : '');
+%>
+<section class="section social-feed-section">
+  <h2 class="section-title"><%= heading %></h2>
+  <div class="social-links-row">
+    <% if (instagramHandle) { %>
+    <a href="https://instagram.com/<%= instagramHandle.replace('@','') %>" target="_blank" class="social-link-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+      <span>@<%= instagramHandle.replace('@','') %></span>
+    </a>
+    <% } %>
+    <% if (tiktokHandle) { %>
+    <a href="https://tiktok.com/@<%= tiktokHandle.replace('@','') %>" target="_blank" class="social-link-card">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.89a8.28 8.28 0 004.76 1.5V6.93a4.84 4.84 0 01-1-.24z"/></svg>
+      <span>@<%= tiktokHandle.replace('@','') %></span>
+    </a>
+    <% } %>
+  </div>
+</section>

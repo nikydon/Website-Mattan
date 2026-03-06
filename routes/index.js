@@ -23,6 +23,14 @@ router.get('/', wrap(async (req, res) => {
   if (settings.layout_content) {
     try { sectionContent = JSON.parse(settings.layout_content); } catch (e) { /* fallback */ }
   }
+  let sectionStyles = {};
+  if (settings.layout_styles) {
+    try { sectionStyles = JSON.parse(settings.layout_styles); } catch (e) { /* fallback */ }
+  }
+  let sectionVisibility = {};
+  if (settings.layout_visibility) {
+    try { sectionVisibility = JSON.parse(settings.layout_visibility); } catch (e) { /* fallback */ }
+  }
 
   const [collections, featuredProducts, recentPosts] = await Promise.all([
     prisma.collection.findMany({
@@ -51,7 +59,7 @@ router.get('/', wrap(async (req, res) => {
     }),
   ]);
 
-  res.render('index', { settings, layoutSections, sectionContent, collections, featuredProducts, recentPosts });
+  res.render('index', { settings, layoutSections, sectionContent, sectionStyles, sectionVisibility, collections, featuredProducts, recentPosts });
 }));
 
 // ─── Collections listing ─────────────────────────────

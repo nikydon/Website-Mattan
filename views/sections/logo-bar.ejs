@@ -1,0 +1,22 @@
+<%
+  var c = (typeof sectionContent !== 'undefined' && sectionContent['logo-bar']) || {};
+  var heading = c.heading || 'As Seen In';
+  var logos = [];
+  try { logos = c.logos ? JSON.parse(c.logos) : []; } catch(e) {}
+%>
+<section class="section logo-bar-section">
+  <% if (heading) { %>
+    <h2 class="section-title"><%= heading %></h2>
+  <% } %>
+  <div class="logo-bar-row">
+    <% if (logos.length) { %>
+      <% logos.forEach(function(logo) { %>
+        <div class="logo-bar-item">
+          <img src="<%= logo.url || logo %>" alt="<%= logo.alt || '' %>" loading="lazy">
+        </div>
+      <% }); %>
+    <% } else { %>
+      <div class="logo-bar-empty">Add partner/press logos via the layout editor</div>
+    <% } %>
+  </div>
+</section>
