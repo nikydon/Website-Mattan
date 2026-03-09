@@ -14,6 +14,16 @@
       <% } %>
     </div>
     <div class="le-toolbar-center">
+      <!-- Undo / Redo -->
+      <div class="le-history-btns">
+        <button class="le-tool-btn" id="undoBtn" onclick="undo()" title="Undo (Ctrl+Z)" disabled>
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 10h10a5 5 0 015 5v2M3 10l4-4M3 10l4 4"/></svg>
+        </button>
+        <button class="le-tool-btn" id="redoBtn" onclick="redo()" title="Redo (Ctrl+Y)" disabled>
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 10H11a5 5 0 00-5 5v2M21 10l-4-4M21 10l-4 4"/></svg>
+        </button>
+      </div>
+      <div class="le-toolbar-sep"></div>
       <!-- Responsive Preview Controls -->
       <div class="le-device-switcher">
         <button class="le-device-btn active" data-device="desktop" title="Desktop">
@@ -24,6 +34,17 @@
         </button>
         <button class="le-device-btn" data-device="mobile" title="Mobile">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+        </button>
+      </div>
+      <div class="le-toolbar-sep"></div>
+      <!-- Zoom -->
+      <div class="le-zoom-controls">
+        <button class="le-tool-btn" onclick="changeZoom(-10)" title="Zoom Out">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M8 11h6"/></svg>
+        </button>
+        <span class="le-zoom-label" id="zoomLabel">100%</span>
+        <button class="le-tool-btn" onclick="changeZoom(10)" title="Zoom In">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M8 11h6M11 8v6"/></svg>
         </button>
       </div>
     </div>
@@ -52,6 +73,11 @@
 
       <!-- Components Tab: Drag-and-Drop Library -->
       <div class="le-tab-content" id="tab-components">
+        <!-- Search -->
+        <div class="le-comp-search">
+          <input type="text" id="compSearch" class="le-field-input" placeholder="Search components..." oninput="filterComponents(this.value)">
+        </div>
+
         <div class="le-component-group">
           <h4 class="le-group-title">Content</h4>
           <div class="le-comp-item" draggable="true" data-block="hero">
@@ -145,6 +171,12 @@
     <!-- Center: Live Preview -->
     <div class="le-preview-area" id="lePreviewArea">
       <div class="le-preview-frame-wrapper" id="previewFrameWrapper">
+        <div class="le-canvas-drop-overlay" id="canvasDropOverlay" style="display:none;">
+          <div class="le-canvas-drop-msg">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg>
+            <span>Drop to add section</span>
+          </div>
+        </div>
         <iframe id="previewFrame" class="le-preview-frame" sandbox="allow-same-origin allow-scripts"></iframe>
         <div class="le-preview-loading" id="previewLoading">
           <div class="le-spinner"></div>
@@ -163,7 +195,7 @@
       <div class="le-tab-content active" id="tab-content-edit">
         <div class="le-no-selection" id="contentNoSelection">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
-          <p>Select a section from the left panel to edit its content.</p>
+          <p>Select a section to edit its content.</p>
         </div>
         <div id="contentEditFields" style="display:none;"></div>
       </div>
@@ -174,6 +206,51 @@
           <p>Select a section to adjust its styling.</p>
         </div>
         <div id="styleEditFields" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Image Upload Modal -->
+<div class="le-modal-overlay" id="imageUploadModal" style="display:none;">
+  <div class="le-modal">
+    <div class="le-modal-header">
+      <h3>Upload Image</h3>
+      <button class="le-modal-close" onclick="closeImageModal()">&times;</button>
+    </div>
+    <div class="le-modal-body">
+      <div class="le-upload-zone" id="uploadZone">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        <p>Drag & drop an image or <label class="le-upload-browse" for="imageFileInput">browse</label></p>
+        <input type="file" id="imageFileInput" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
+      </div>
+      <div class="le-upload-progress" id="uploadProgress" style="display:none;">
+        <div class="le-progress-bar"><div class="le-progress-fill" id="uploadFill"></div></div>
+        <span id="uploadStatus">Uploading...</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Keyboard Shortcuts Modal -->
+<div class="le-modal-overlay" id="shortcutsModal" style="display:none;">
+  <div class="le-modal">
+    <div class="le-modal-header">
+      <h3>Keyboard Shortcuts</h3>
+      <button class="le-modal-close" onclick="document.getElementById('shortcutsModal').style.display='none'">&times;</button>
+    </div>
+    <div class="le-modal-body">
+      <div class="le-shortcut-list">
+        <div class="le-shortcut-item"><kbd>Ctrl+Z</kbd><span>Undo</span></div>
+        <div class="le-shortcut-item"><kbd>Ctrl+Y</kbd><span>Redo</span></div>
+        <div class="le-shortcut-item"><kbd>Ctrl+S</kbd><span>Save Draft</span></div>
+        <div class="le-shortcut-item"><kbd>Ctrl+Shift+P</kbd><span>Publish</span></div>
+        <div class="le-shortcut-item"><kbd>Ctrl+D</kbd><span>Duplicate Section</span></div>
+        <div class="le-shortcut-item"><kbd>Delete</kbd><span>Delete Section</span></div>
+        <div class="le-shortcut-item"><kbd>Ctrl+&uarr;</kbd><span>Move Section Up</span></div>
+        <div class="le-shortcut-item"><kbd>Ctrl+&darr;</kbd><span>Move Section Down</span></div>
+        <div class="le-shortcut-item"><kbd>Escape</kbd><span>Deselect</span></div>
+        <div class="le-shortcut-item"><kbd>?</kbd><span>Show Shortcuts</span></div>
       </div>
     </div>
   </div>
@@ -191,6 +268,67 @@ var sectionStyles = <%- JSON.stringify(sectionStyles) %>;
 var sectionVisibility = <%- JSON.stringify(sectionVisibility) %>;
 var selectedIdx = -1;
 var previewDebounce = null;
+var zoomLevel = 100;
+var imageUploadCallback = null;
+
+// Undo/Redo history
+var historyStack = [];
+var historyIdx = -1;
+var maxHistory = 50;
+
+function cloneState() {
+  return {
+    sections: JSON.parse(JSON.stringify(sections)),
+    sectionContent: JSON.parse(JSON.stringify(sectionContent)),
+    sectionStyles: JSON.parse(JSON.stringify(sectionStyles)),
+    sectionVisibility: JSON.parse(JSON.stringify(sectionVisibility)),
+    selectedIdx: selectedIdx
+  };
+}
+
+function pushHistory() {
+  historyIdx++;
+  historyStack = historyStack.slice(0, historyIdx);
+  historyStack.push(cloneState());
+  if (historyStack.length > maxHistory) {
+    historyStack.shift();
+    historyIdx--;
+  }
+  updateHistoryBtns();
+}
+
+function undo() {
+  if (historyIdx <= 0) return;
+  historyIdx--;
+  restoreState(historyStack[historyIdx]);
+}
+
+function redo() {
+  if (historyIdx >= historyStack.length - 1) return;
+  historyIdx++;
+  restoreState(historyStack[historyIdx]);
+}
+
+function restoreState(state) {
+  sections = JSON.parse(JSON.stringify(state.sections));
+  sectionContent = JSON.parse(JSON.stringify(state.sectionContent));
+  sectionStyles = JSON.parse(JSON.stringify(state.sectionStyles));
+  sectionVisibility = JSON.parse(JSON.stringify(state.sectionVisibility));
+  selectedIdx = state.selectedIdx;
+  renderSectionList();
+  renderContentPanel();
+  renderStylePanel();
+  refreshPreview();
+  updateHistoryBtns();
+}
+
+function updateHistoryBtns() {
+  document.getElementById('undoBtn').disabled = historyIdx <= 0;
+  document.getElementById('redoBtn').disabled = historyIdx >= historyStack.length - 1;
+}
+
+// Initialize history with initial state
+pushHistory();
 
 var blockLabels = {
   'hero': 'Hero Banner', 'featured-products': 'Featured Products', 'collections-grid': 'Collections Grid',
@@ -217,7 +355,7 @@ var blockFields = {
   'banner': [
     { key: 'heading', label: 'Heading', type: 'text', placeholder: 'Sale Now On' },
     { key: 'subtitle', label: 'Subtitle', type: 'text', placeholder: 'Up to 50% off' },
-    { key: 'imageUrl', label: 'Background Image URL', type: 'text', placeholder: '/uploads/banner.jpg' },
+    { key: 'imageUrl', label: 'Background Image', type: 'image', placeholder: '/uploads/banner.jpg' },
     { key: 'linkUrl', label: 'Link URL', type: 'text', placeholder: '/collections' },
     { key: 'linkText', label: 'Link Text', type: 'text', placeholder: 'Learn More' }
   ],
@@ -236,7 +374,7 @@ var blockFields = {
   'brand-story': [
     { key: 'heading', label: 'Heading', type: 'text', placeholder: 'Our Story' },
     { key: 'body', label: 'Story Text', type: 'textarea', placeholder: 'Tell your brand story...' },
-    { key: 'imageUrl', label: 'Image URL', type: 'text', placeholder: '/uploads/story.jpg' }
+    { key: 'imageUrl', label: 'Image', type: 'image', placeholder: '/uploads/story.jpg' }
   ],
   'testimonials': [
     { key: 'heading', label: 'Heading', type: 'text', placeholder: 'What Our Customers Say' },
@@ -258,7 +396,7 @@ var blockFields = {
   'countdown': [
     { key: 'heading', label: 'Heading', type: 'text', placeholder: 'Coming Soon' },
     { key: 'subtitle', label: 'Subtitle', type: 'text', placeholder: '' },
-    { key: 'targetDate', label: 'Target Date', type: 'text', placeholder: '2026-12-31T00:00:00' },
+    { key: 'targetDate', label: 'Target Date', type: 'datetime', placeholder: '2026-12-31T00:00:00' },
     { key: 'ctaText', label: 'Button Text', type: 'text', placeholder: '' },
     { key: 'ctaLink', label: 'Button Link', type: 'text', placeholder: '' }
   ],
@@ -268,8 +406,8 @@ var blockFields = {
     { key: 'tiktokHandle', label: 'TikTok Handle', type: 'text', placeholder: '@yourbrand' }
   ],
   'divider': [
-    { key: 'style', label: 'Style (line/dots/space)', type: 'text', placeholder: 'line' },
-    { key: 'spacing', label: 'Spacing (rem)', type: 'text', placeholder: '3' }
+    { key: 'style', label: 'Style', type: 'select', options: [{v:'line',l:'Line'},{v:'dots',l:'Dots'},{v:'space',l:'Space'}] },
+    { key: 'spacing', label: 'Spacing (rem)', type: 'number', placeholder: '3' }
   ],
   'features-grid': [
     { key: 'heading', label: 'Heading', type: 'text', placeholder: '' },
@@ -286,6 +424,34 @@ var blockFields = {
     { key: 'logos', label: 'Logo URLs (JSON)', type: 'textarea', placeholder: '["/uploads/logo1.png","/uploads/logo2.png"]' }
   ]
 };
+
+// ═══════════════════════════════════════════════════════
+// COMPONENT SEARCH
+// ═══════════════════════════════════════════════════════
+function filterComponents(query) {
+  var q = query.toLowerCase();
+  document.querySelectorAll('.le-comp-item').forEach(function(item) {
+    var text = item.textContent.toLowerCase();
+    item.style.display = text.indexOf(q) >= 0 ? '' : 'none';
+  });
+  document.querySelectorAll('.le-component-group').forEach(function(group) {
+    var visibleItems = group.querySelectorAll('.le-comp-item:not([style*="display: none"])');
+    group.style.display = visibleItems.length > 0 ? '' : 'none';
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// ZOOM
+// ═══════════════════════════════════════════════════════
+function changeZoom(delta) {
+  zoomLevel = Math.min(150, Math.max(50, zoomLevel + delta));
+  document.getElementById('zoomLabel').textContent = zoomLevel + '%';
+  var frame = document.getElementById('previewFrame');
+  frame.style.transform = 'scale(' + (zoomLevel / 100) + ')';
+  frame.style.transformOrigin = 'top center';
+  frame.style.width = (10000 / zoomLevel) + '%';
+  frame.style.height = (10000 / zoomLevel) + '%';
+}
 
 // ═══════════════════════════════════════════════════════
 // SECTION LIST (LEFT PANEL)
@@ -318,6 +484,9 @@ function renderSectionList() {
       '<span class="le-section-drag"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 8h16M4 16h16"/></svg></span>' +
       '<span class="le-section-label">' + (blockLabels[s] || s) + '</span>' +
       '<div class="le-section-btns">' +
+        '<button class="le-icon-btn" onclick="duplicateSection(' + i + ', event)" title="Duplicate">' +
+          '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>' +
+        '</button>' +
         '<button class="le-icon-btn' + (isHidden ? ' le-toggled-off' : '') + '" onclick="toggleVisibility(' + i + ', event)" title="' + (isHidden ? 'Show' : 'Hide') + '">' +
           (isHidden ? '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M3 3l18 18"/></svg>'
                     : '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>') +
@@ -353,19 +522,21 @@ function renderSectionList() {
       e.preventDefault();
       e.stopPropagation();
       el.classList.remove('drag-over');
-      // Check if from component panel
       var blockType = e.dataTransfer.getData('block-type');
       if (blockType) {
+        pushHistory();
         sections.splice(i, 0, blockType);
         selectedIdx = i;
         renderSectionList();
+        renderContentPanel();
+        renderStylePanel();
         refreshPreview();
         return;
       }
       if (dragSrcEl && dragSrcEl !== el) {
         var fromIdx = parseInt(dragSrcEl.dataset.index);
         var toIdx = parseInt(el.dataset.index);
-        // Remap styles/visibility keys
+        pushHistory();
         remapKeys(fromIdx, toIdx);
         var moved = sections.splice(fromIdx, 1)[0];
         sections.splice(toIdx, 0, moved);
@@ -381,7 +552,6 @@ function renderSectionList() {
 }
 
 function remapKeys(fromIdx, toIdx) {
-  // Remap style/visibility keys when sections are reordered
   var newStyles = {};
   var newVis = {};
   sections.forEach(function(s, i) {
@@ -398,15 +568,18 @@ function remapKeys(fromIdx, toIdx) {
   sectionVisibility = newVis;
 }
 
-// Drop zone for section list (catch drops from component library)
+// Drop zone for section list
 sectionList.addEventListener('dragover', function(e) { e.preventDefault(); });
 sectionList.addEventListener('drop', function(e) {
   e.preventDefault();
   var blockType = e.dataTransfer.getData('block-type');
   if (blockType && blockLabels[blockType]) {
+    pushHistory();
     sections.push(blockType);
     selectedIdx = sections.length - 1;
     renderSectionList();
+    renderContentPanel();
+    renderStylePanel();
     refreshPreview();
   }
 });
@@ -416,10 +589,12 @@ function selectSection(idx) {
   renderSectionList();
   renderContentPanel();
   renderStylePanel();
+  highlightPreviewSection(idx);
 }
 
 function toggleVisibility(idx, e) {
   e.stopPropagation();
+  pushHistory();
   var vk = getVisKey(sections[idx], idx);
   if (!sectionVisibility[vk]) sectionVisibility[vk] = {};
   sectionVisibility[vk].hidden = !sectionVisibility[vk].hidden;
@@ -429,12 +604,58 @@ function toggleVisibility(idx, e) {
 
 function removeSection(idx, e) {
   e.stopPropagation();
+  if (!confirm('Remove this section?')) return;
+  pushHistory();
   var vk = getVisKey(sections[idx], idx);
   delete sectionStyles[vk];
   delete sectionVisibility[vk];
   sections.splice(idx, 1);
   if (selectedIdx === idx) { selectedIdx = -1; renderContentPanel(); renderStylePanel(); }
   else if (selectedIdx > idx) selectedIdx--;
+  renderSectionList();
+  refreshPreview();
+}
+
+function duplicateSection(idx, e) {
+  e.stopPropagation();
+  pushHistory();
+  var s = sections[idx];
+  var newIdx = idx + 1;
+  sections.splice(newIdx, 0, s);
+  // Copy styles and visibility
+  var oldVk = getVisKey(s, idx);
+  var newVk = getVisKey(s, newIdx);
+  if (sectionStyles[oldVk]) sectionStyles[newVk] = JSON.parse(JSON.stringify(sectionStyles[oldVk]));
+  if (sectionVisibility[oldVk]) sectionVisibility[newVk] = JSON.parse(JSON.stringify(sectionVisibility[oldVk]));
+  selectedIdx = newIdx;
+  renderSectionList();
+  renderContentPanel();
+  renderStylePanel();
+  refreshPreview();
+}
+
+function moveSectionUp() {
+  if (selectedIdx <= 0) return;
+  pushHistory();
+  var fromIdx = selectedIdx;
+  var toIdx = selectedIdx - 1;
+  remapKeys(fromIdx, toIdx);
+  var moved = sections.splice(fromIdx, 1)[0];
+  sections.splice(toIdx, 0, moved);
+  selectedIdx = toIdx;
+  renderSectionList();
+  refreshPreview();
+}
+
+function moveSectionDown() {
+  if (selectedIdx < 0 || selectedIdx >= sections.length - 1) return;
+  pushHistory();
+  var fromIdx = selectedIdx;
+  var toIdx = selectedIdx + 1;
+  remapKeys(fromIdx, toIdx);
+  var moved = sections.splice(fromIdx, 1)[0];
+  sections.splice(toIdx, 0, moved);
+  selectedIdx = toIdx;
   renderSectionList();
   refreshPreview();
 }
@@ -467,6 +688,24 @@ function renderContentPanel() {
       html += '<label class="le-field-label">' + f.label + '</label>';
       if (f.type === 'textarea') {
         html += '<textarea class="le-field-input" data-section="' + s + '" data-key="' + f.key + '" placeholder="' + f.placeholder + '" rows="4">' + val + '</textarea>';
+      } else if (f.type === 'image') {
+        html += '<div class="le-image-field">';
+        html += '<input type="text" class="le-field-input" data-section="' + s + '" data-key="' + f.key + '" value="' + val.replace(/"/g, '&quot;') + '" placeholder="' + f.placeholder + '">';
+        html += '<button class="le-upload-btn" onclick="openImageUpload(\'' + s + '\', \'' + f.key + '\')" title="Upload Image">' +
+          '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>' +
+          '</button>';
+        if (val) html += '<div class="le-image-preview"><img src="' + val.replace(/"/g, '&quot;') + '" alt="Preview"></div>';
+        html += '</div>';
+      } else if (f.type === 'select') {
+        html += '<select class="le-field-select" data-section="' + s + '" data-key="' + f.key + '">';
+        (f.options || []).forEach(function(opt) {
+          html += '<option value="' + opt.v + '"' + (val === opt.v ? ' selected' : '') + '>' + opt.l + '</option>';
+        });
+        html += '</select>';
+      } else if (f.type === 'number') {
+        html += '<input type="number" class="le-field-input" data-section="' + s + '" data-key="' + f.key + '" value="' + val + '" placeholder="' + f.placeholder + '">';
+      } else if (f.type === 'datetime') {
+        html += '<input type="datetime-local" class="le-field-input" data-section="' + s + '" data-key="' + f.key + '" value="' + val + '" placeholder="' + f.placeholder + '">';
       } else {
         html += '<input type="text" class="le-field-input" data-section="' + s + '" data-key="' + f.key + '" value="' + val.replace(/"/g, '&quot;') + '" placeholder="' + f.placeholder + '">';
       }
@@ -476,19 +715,24 @@ function renderContentPanel() {
   fields.innerHTML = html;
 
   // Attach input handlers
-  fields.querySelectorAll('.le-field-input').forEach(function(input) {
-    input.addEventListener('input', function() {
-      var sec = this.dataset.section;
-      var key = this.dataset.key;
-      if (!sectionContent[sec]) sectionContent[sec] = {};
-      sectionContent[sec][key] = this.value;
-      debouncedPreview();
+  fields.querySelectorAll('.le-field-input, .le-field-select').forEach(function(input) {
+    var evts = ['input'];
+    if (input.tagName === 'SELECT') evts = ['change'];
+    evts.forEach(function(evt) {
+      input.addEventListener(evt, function() {
+        var sec = this.dataset.section;
+        var key = this.dataset.key;
+        if (!sectionContent[sec]) sectionContent[sec] = {};
+        sectionContent[sec][key] = this.value;
+        pushHistory();
+        debouncedPreview();
+      });
     });
   });
 }
 
 // ═══════════════════════════════════════════════════════
-// STYLE PANEL (RIGHT)
+// STYLE PANEL (RIGHT) - ENHANCED
 // ═══════════════════════════════════════════════════════
 function renderStylePanel() {
   var noSel = document.getElementById('styleNoSelection');
@@ -507,65 +751,176 @@ function renderStylePanel() {
 
   var html = '<h3 class="le-props-title">Style: ' + (blockLabels[s] || s) + '</h3>';
 
-  // Background color
-  html += '<div class="le-field"><label class="le-field-label">Background Color</label>' +
-    '<div class="le-color-row"><input type="color" class="le-color-picker" data-style-key="bgColor" value="' + (st.bgColor || '#ffffff') + '">' +
-    '<input type="text" class="le-field-input le-field-sm" data-style-key="bgColor" value="' + (st.bgColor || '') + '" placeholder="#ffffff"></div></div>';
+  // --- Colors ---
+  html += '<div class="le-style-group"><div class="le-style-group-title" onclick="toggleStyleGroup(this)"><span>Colors</span><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></div><div class="le-style-group-body">';
+  html += colorField('Background Color', 'bgColor', st.bgColor, '#ffffff');
+  html += colorField('Text Color', 'textColor', st.textColor, '#1a1a1a');
+  html += '</div></div>';
 
-  // Text color
-  html += '<div class="le-field"><label class="le-field-label">Text Color</label>' +
-    '<div class="le-color-row"><input type="color" class="le-color-picker" data-style-key="textColor" value="' + (st.textColor || '#1a1a1a') + '">' +
-    '<input type="text" class="le-field-input le-field-sm" data-style-key="textColor" value="' + (st.textColor || '') + '" placeholder="#1a1a1a"></div></div>';
-
-  // Font family
+  // --- Typography ---
+  html += '<div class="le-style-group"><div class="le-style-group-title" onclick="toggleStyleGroup(this)"><span>Typography</span><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></div><div class="le-style-group-body">';
   html += '<div class="le-field"><label class="le-field-label">Font Family</label>' +
     '<select class="le-field-select" data-style-key="fontFamily">' +
     '<option value="">Default</option>' +
-    '<option value="Inter"' + (st.fontFamily === 'Inter' ? ' selected' : '') + '>Inter</option>' +
-    '<option value="Georgia"' + (st.fontFamily === 'Georgia' ? ' selected' : '') + '>Georgia</option>' +
-    '<option value="Playfair Display"' + (st.fontFamily === 'Playfair Display' ? ' selected' : '') + '>Playfair Display</option>' +
-    '<option value="Roboto"' + (st.fontFamily === 'Roboto' ? ' selected' : '') + '>Roboto</option>' +
-    '<option value="Montserrat"' + (st.fontFamily === 'Montserrat' ? ' selected' : '') + '>Montserrat</option>' +
-    '<option value="Lora"' + (st.fontFamily === 'Lora' ? ' selected' : '') + '>Lora</option>' +
+    ['Inter','Georgia','Playfair Display','Roboto','Montserrat','Lora','Poppins','Raleway','Open Sans','Merriweather'].map(function(f) {
+      return '<option value="' + f + '"' + (st.fontFamily === f ? ' selected' : '') + ' style="font-family:' + f + '">' + f + '</option>';
+    }).join('') +
     '</select></div>';
-
-  // Font size
   html += '<div class="le-field"><label class="le-field-label">Font Size (px)</label>' +
-    '<input type="number" class="le-field-input" data-style-key="fontSize" value="' + (st.fontSize || '') + '" placeholder="16" min="10" max="72"></div>';
+    '<input type="number" class="le-field-input" data-style-key="fontSize" value="' + (st.fontSize || '') + '" placeholder="16" min="10" max="120"></div>';
+  html += '<div class="le-field"><label class="le-field-label">Font Weight</label>' +
+    '<select class="le-field-select" data-style-key="fontWeight">' +
+    '<option value="">Default</option>' +
+    [{v:'300',l:'Light'},{v:'400',l:'Normal'},{v:'500',l:'Medium'},{v:'600',l:'Semibold'},{v:'700',l:'Bold'},{v:'800',l:'Extra Bold'}].map(function(o) {
+      return '<option value="' + o.v + '"' + (st.fontWeight === o.v ? ' selected' : '') + '>' + o.l + '</option>';
+    }).join('') +
+    '</select></div>';
+  html += '<div class="le-field"><label class="le-field-label">Text Align</label>' +
+    '<div class="le-btn-group">' +
+    [{v:'left',icon:'M4 6h16M4 12h10M4 18h16'},{v:'center',icon:'M4 6h16M7 12h10M4 18h16'},{v:'right',icon:'M4 6h16M10 12h10M4 18h16'}].map(function(o) {
+      return '<button class="le-btn-group-item' + (st.textAlign === o.v ? ' active' : '') + '" data-style-key="textAlign" data-val="' + o.v + '" onclick="setStyleGroupVal(this)" title="' + o.v + '">' +
+        '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="' + o.icon + '"/></svg></button>';
+    }).join('') +
+    '</div></div>';
+  html += '<div class="le-field"><label class="le-field-label">Letter Spacing (px)</label>' +
+    '<input type="number" class="le-field-input" data-style-key="letterSpacing" value="' + (st.letterSpacing || '') + '" placeholder="0" min="-2" max="20" step="0.5"></div>';
+  html += '<div class="le-field"><label class="le-field-label">Line Height</label>' +
+    '<input type="number" class="le-field-input" data-style-key="lineHeight" value="' + (st.lineHeight || '') + '" placeholder="1.6" min="0.8" max="3" step="0.1"></div>';
+  html += '</div></div>';
 
-  // Padding
-  html += '<div class="le-field-row">' +
-    '<div class="le-field"><label class="le-field-label">Padding Top (px)</label>' +
-    '<input type="number" class="le-field-input" data-style-key="paddingTop" value="' + (st.paddingTop || '') + '" placeholder="64" min="0" max="300"></div>' +
-    '<div class="le-field"><label class="le-field-label">Padding Bottom (px)</label>' +
-    '<input type="number" class="le-field-input" data-style-key="paddingBottom" value="' + (st.paddingBottom || '') + '" placeholder="64" min="0" max="300"></div>' +
-    '</div>';
+  // --- Spacing ---
+  html += '<div class="le-style-group"><div class="le-style-group-title" onclick="toggleStyleGroup(this)"><span>Spacing</span><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></div><div class="le-style-group-body">';
+  html += '<div class="le-spacing-box">' +
+    '<div class="le-spacing-label">Padding</div>' +
+    '<div class="le-spacing-grid">' +
+    '<div></div><input type="number" class="le-spacing-input" data-style-key="paddingTop" value="' + (st.paddingTop || '') + '" placeholder="64" title="Top"><div></div>' +
+    '<input type="number" class="le-spacing-input" data-style-key="paddingLeft" value="' + (st.paddingLeft || '') + '" placeholder="0" title="Left">' +
+    '<div class="le-spacing-center">px</div>' +
+    '<input type="number" class="le-spacing-input" data-style-key="paddingRight" value="' + (st.paddingRight || '') + '" placeholder="0" title="Right">' +
+    '<div></div><input type="number" class="le-spacing-input" data-style-key="paddingBottom" value="' + (st.paddingBottom || '') + '" placeholder="64" title="Bottom"><div></div>' +
+    '</div></div>';
+  html += '<div class="le-spacing-box">' +
+    '<div class="le-spacing-label">Margin</div>' +
+    '<div class="le-spacing-grid">' +
+    '<div></div><input type="number" class="le-spacing-input" data-style-key="marginTop" value="' + (st.marginTop || '') + '" placeholder="0" title="Top"><div></div>' +
+    '<input type="number" class="le-spacing-input" data-style-key="marginLeft" value="' + (st.marginLeft || '') + '" placeholder="0" title="Left">' +
+    '<div class="le-spacing-center">px</div>' +
+    '<input type="number" class="le-spacing-input" data-style-key="marginRight" value="' + (st.marginRight || '') + '" placeholder="0" title="Right">' +
+    '<div></div><input type="number" class="le-spacing-input" data-style-key="marginBottom" value="' + (st.marginBottom || '') + '" placeholder="0" title="Bottom"><div></div>' +
+    '</div></div>';
+  html += '</div></div>';
 
-  // Background image
+  // --- Background ---
+  html += '<div class="le-style-group"><div class="le-style-group-title" onclick="toggleStyleGroup(this)"><span>Background</span><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></div><div class="le-style-group-body">';
   html += '<div class="le-field"><label class="le-field-label">Background Image URL</label>' +
-    '<input type="text" class="le-field-input" data-style-key="bgImage" value="' + (st.bgImage || '') + '" placeholder="/uploads/bg.jpg"></div>';
+    '<div class="le-image-field"><input type="text" class="le-field-input" data-style-key="bgImage" value="' + (st.bgImage || '') + '" placeholder="/uploads/bg.jpg">' +
+    '<button class="le-upload-btn" onclick="openImageUploadForStyle(\'bgImage\')" title="Upload">' +
+    '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>' +
+    '</button></div></div>';
+  html += '<div class="le-field"><label class="le-field-label">Background Size</label>' +
+    '<select class="le-field-select" data-style-key="bgSize">' +
+    ['','cover','contain','auto','100% 100%'].map(function(v) {
+      return '<option value="' + v + '"' + (st.bgSize === v ? ' selected' : '') + '>' + (v || 'Default') + '</option>';
+    }).join('') +
+    '</select></div>';
+  html += '<div class="le-field"><label class="le-field-label">Background Position</label>' +
+    '<select class="le-field-select" data-style-key="bgPosition">' +
+    ['','center','top','bottom','left','right'].map(function(v) {
+      return '<option value="' + v + '"' + (st.bgPosition === v ? ' selected' : '') + '>' + (v || 'Default') + '</option>';
+    }).join('') +
+    '</select></div>';
+  html += '<div class="le-field"><label class="le-field-label">Background Overlay Opacity</label>' +
+    '<input type="range" class="le-range-input" data-style-key="bgOverlay" value="' + (st.bgOverlay || '0') + '" min="0" max="100" step="5">' +
+    '<span class="le-range-val">' + (st.bgOverlay || '0') + '%</span></div>';
+  html += '</div></div>';
 
-  // Reset styles button
-  html += '<button class="btn btn--small" onclick="resetSectionStyle()" style="margin-top:1rem;">Reset Styles</button>';
+  // --- Borders ---
+  html += '<div class="le-style-group"><div class="le-style-group-title" onclick="toggleStyleGroup(this)"><span>Border & Shadow</span><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></div><div class="le-style-group-body">';
+  html += '<div class="le-field"><label class="le-field-label">Border Radius (px)</label>' +
+    '<input type="number" class="le-field-input" data-style-key="borderRadius" value="' + (st.borderRadius || '') + '" placeholder="0" min="0" max="100"></div>';
+  html += '<div class="le-field"><label class="le-field-label">Border Width (px)</label>' +
+    '<input type="number" class="le-field-input" data-style-key="borderWidth" value="' + (st.borderWidth || '') + '" placeholder="0" min="0" max="20"></div>';
+  html += colorField('Border Color', 'borderColor', st.borderColor, '#e0ddd8');
+  html += '<div class="le-field"><label class="le-field-label">Box Shadow</label>' +
+    '<select class="le-field-select" data-style-key="boxShadow">' +
+    [{v:'',l:'None'},{v:'0 1px 3px rgba(0,0,0,0.1)',l:'Small'},{v:'0 4px 6px rgba(0,0,0,0.1)',l:'Medium'},{v:'0 10px 25px rgba(0,0,0,0.15)',l:'Large'},{v:'0 20px 50px rgba(0,0,0,0.2)',l:'Extra Large'},{v:'inset 0 2px 4px rgba(0,0,0,0.1)',l:'Inset'}].map(function(o) {
+      return '<option value="' + o.v + '"' + ((st.boxShadow || '') === o.v ? ' selected' : '') + '>' + o.l + '</option>';
+    }).join('') +
+    '</select></div>';
+  html += '</div></div>';
+
+  // --- Effects ---
+  html += '<div class="le-style-group"><div class="le-style-group-title" onclick="toggleStyleGroup(this)"><span>Effects & Animation</span><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></div><div class="le-style-group-body">';
+  html += '<div class="le-field"><label class="le-field-label">Opacity</label>' +
+    '<input type="range" class="le-range-input" data-style-key="opacity" value="' + (st.opacity || '100') + '" min="0" max="100" step="5">' +
+    '<span class="le-range-val">' + (st.opacity || '100') + '%</span></div>';
+  html += '<div class="le-field"><label class="le-field-label">Entrance Animation</label>' +
+    '<select class="le-field-select" data-style-key="animation">' +
+    [{v:'',l:'None'},{v:'fadeIn',l:'Fade In'},{v:'slideUp',l:'Slide Up'},{v:'slideLeft',l:'Slide from Left'},{v:'slideRight',l:'Slide from Right'},{v:'zoomIn',l:'Zoom In'},{v:'bounce',l:'Bounce'}].map(function(o) {
+      return '<option value="' + o.v + '"' + ((st.animation || '') === o.v ? ' selected' : '') + '>' + o.l + '</option>';
+    }).join('') +
+    '</select></div>';
+  html += '<div class="le-field"><label class="le-field-label">Max Width</label>' +
+    '<select class="le-field-select" data-style-key="maxWidth">' +
+    [{v:'',l:'Default'},{v:'800px',l:'Narrow (800px)'},{v:'1000px',l:'Medium (1000px)'},{v:'1200px',l:'Wide (1200px)'},{v:'100%',l:'Full Width'}].map(function(o) {
+      return '<option value="' + o.v + '"' + ((st.maxWidth || '') === o.v ? ' selected' : '') + '>' + o.l + '</option>';
+    }).join('') +
+    '</select></div>';
+  html += '</div></div>';
+
+  // Reset
+  html += '<button class="btn btn--small le-reset-btn" onclick="resetSectionStyle()">Reset All Styles</button>';
 
   fields.innerHTML = html;
 
   // Attach style handlers
   fields.querySelectorAll('[data-style-key]').forEach(function(input) {
-    var evName = (input.type === 'color') ? 'input' : 'change';
+    if (input.classList.contains('le-btn-group-item')) return; // handled by onclick
     input.addEventListener('input', function() {
       updateStyleValue(this);
+      // Update range value display
+      if (this.type === 'range') {
+        var display = this.nextElementSibling;
+        if (display) display.textContent = this.value + '%';
+      }
     });
-    if (evName === 'change') {
-      input.addEventListener('change', function() {
-        updateStyleValue(this);
-      });
-    }
+    input.addEventListener('change', function() {
+      updateStyleValue(this);
+    });
   });
+}
+
+function colorField(label, key, val, def) {
+  return '<div class="le-field"><label class="le-field-label">' + label + '</label>' +
+    '<div class="le-color-row"><input type="color" class="le-color-picker" data-style-key="' + key + '" value="' + (val || def) + '">' +
+    '<input type="text" class="le-field-input le-field-sm" data-style-key="' + key + '" value="' + (val || '') + '" placeholder="' + def + '"></div></div>';
+}
+
+function toggleStyleGroup(el) {
+  var body = el.nextElementSibling;
+  var group = el.parentElement;
+  group.classList.toggle('collapsed');
+}
+
+function setStyleGroupVal(btn) {
+  var key = btn.dataset.styleKey;
+  var val = btn.dataset.val;
+  var vk = getVisKey(sections[selectedIdx], selectedIdx);
+  if (!sectionStyles[vk]) sectionStyles[vk] = {};
+  // Toggle if same value
+  if (sectionStyles[vk][key] === val) {
+    delete sectionStyles[vk][key];
+  } else {
+    sectionStyles[vk][key] = val;
+  }
+  pushHistory();
+  renderStylePanel();
+  debouncedPreview();
 }
 
 function updateStyleValue(input) {
   var key = input.dataset.styleKey;
+  if (selectedIdx < 0) return;
   var vk = getVisKey(sections[selectedIdx], selectedIdx);
   if (!sectionStyles[vk]) sectionStyles[vk] = {};
 
@@ -584,16 +939,102 @@ function updateStyleValue(input) {
     });
   }
 
+  pushHistory();
   debouncedPreview();
 }
 
 function resetSectionStyle() {
   if (selectedIdx < 0) return;
+  pushHistory();
   var vk = getVisKey(sections[selectedIdx], selectedIdx);
   delete sectionStyles[vk];
   renderStylePanel();
   refreshPreview();
 }
+
+// ═══════════════════════════════════════════════════════
+// IMAGE UPLOAD
+// ═══════════════════════════════════════════════════════
+function openImageUpload(section, key) {
+  imageUploadCallback = function(url) {
+    if (!sectionContent[section]) sectionContent[section] = {};
+    sectionContent[section][key] = url;
+    pushHistory();
+    renderContentPanel();
+    debouncedPreview();
+  };
+  document.getElementById('imageUploadModal').style.display = 'flex';
+}
+
+function openImageUploadForStyle(key) {
+  imageUploadCallback = function(url) {
+    if (selectedIdx < 0) return;
+    var vk = getVisKey(sections[selectedIdx], selectedIdx);
+    if (!sectionStyles[vk]) sectionStyles[vk] = {};
+    sectionStyles[vk][key] = url;
+    pushHistory();
+    renderStylePanel();
+    debouncedPreview();
+  };
+  document.getElementById('imageUploadModal').style.display = 'flex';
+}
+
+function closeImageModal() {
+  document.getElementById('imageUploadModal').style.display = 'none';
+  imageUploadCallback = null;
+}
+
+function handleImageUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  var formData = new FormData();
+  formData.append('file', file);
+  formData.append('tenantId', '<%= typeof tenantId !== "undefined" ? tenantId : "default" %>');
+  formData.append('category', 'general');
+
+  var progress = document.getElementById('uploadProgress');
+  var fill = document.getElementById('uploadFill');
+  var status = document.getElementById('uploadStatus');
+  progress.style.display = 'block';
+  fill.style.width = '30%';
+  status.textContent = 'Uploading...';
+
+  fetch('/upload', {
+    method: 'POST',
+    body: formData
+  }).then(function(r) {
+    fill.style.width = '80%';
+    return r.json();
+  }).then(function(data) {
+    fill.style.width = '100%';
+    status.textContent = 'Done!';
+    if (data.fullUrl && imageUploadCallback) {
+      imageUploadCallback(data.fullUrl);
+    }
+    setTimeout(function() {
+      closeImageModal();
+      progress.style.display = 'none';
+      fill.style.width = '0%';
+    }, 500);
+  }).catch(function(err) {
+    status.textContent = 'Upload failed';
+    fill.style.width = '0%';
+  });
+  input.value = '';
+}
+
+// Upload zone drag-and-drop
+var uploadZone = document.getElementById('uploadZone');
+uploadZone.addEventListener('dragover', function(e) { e.preventDefault(); uploadZone.classList.add('drag-active'); });
+uploadZone.addEventListener('dragleave', function() { uploadZone.classList.remove('drag-active'); });
+uploadZone.addEventListener('drop', function(e) {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-active');
+  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+    var fakeInput = { files: e.dataTransfer.files };
+    handleImageUpload(fakeInput);
+  }
+});
 
 // ═══════════════════════════════════════════════════════
 // LIVE PREVIEW
@@ -612,6 +1053,58 @@ function refreshPreview() {
   }).then(function(r) { return r.text(); })
   .then(function(html) {
     var frame = document.getElementById('previewFrame');
+    // Inject interactive editing script into preview
+    var editScript = '<style>' +
+      '[data-section-idx]{position:relative;transition:outline 0.15s}' +
+      '[data-section-idx]:hover{outline:2px dashed #2563eb;outline-offset:-2px;cursor:pointer}' +
+      '[data-section-idx].le-selected{outline:2px solid #2563eb;outline-offset:-2px}' +
+      '.le-section-overlay{position:absolute;top:4px;right:4px;display:none;gap:4px;z-index:999}' +
+      '[data-section-idx]:hover .le-section-overlay,[data-section-idx].le-selected .le-section-overlay{display:flex}' +
+      '.le-overlay-btn{background:#2563eb;color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer;font-family:system-ui}' +
+      '.le-overlay-btn:hover{background:#1d4ed8}' +
+      '.le-drop-indicator{height:4px;background:#2563eb;margin:0;transition:all 0.2s;border-radius:2px}' +
+      '</style>';
+    editScript += '<script>' +
+      'document.addEventListener("click",function(e){' +
+        'var sec=e.target.closest("[data-section-idx]");' +
+        'if(sec){' +
+          'e.preventDefault();e.stopPropagation();' +
+          'document.querySelectorAll("[data-section-idx]").forEach(function(s){s.classList.remove("le-selected")});' +
+          'sec.classList.add("le-selected");' +
+          'parent.postMessage({type:"select-section",idx:parseInt(sec.dataset.sectionIdx)},"*");' +
+        '}' +
+      '});' +
+      'var dragSrc=null;' +
+      'document.querySelectorAll("[data-section-idx]").forEach(function(sec){' +
+        'sec.draggable=true;' +
+        'sec.addEventListener("dragstart",function(e){' +
+          'dragSrc=sec;e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain","");' +
+        '});' +
+        'sec.addEventListener("dragover",function(e){' +
+          'e.preventDefault();e.dataTransfer.dropEffect="move";' +
+          'var rect=sec.getBoundingClientRect();var mid=rect.top+rect.height/2;' +
+          'if(e.clientY<mid){sec.style.borderTop="3px solid #2563eb";sec.style.borderBottom="";}' +
+          'else{sec.style.borderBottom="3px solid #2563eb";sec.style.borderTop="";}' +
+        '});' +
+        'sec.addEventListener("dragleave",function(){sec.style.borderTop="";sec.style.borderBottom="";});' +
+        'sec.addEventListener("drop",function(e){' +
+          'e.preventDefault();sec.style.borderTop="";sec.style.borderBottom="";' +
+          'if(!dragSrc||dragSrc===sec)return;' +
+          'var from=parseInt(dragSrc.dataset.sectionIdx);var to=parseInt(sec.dataset.sectionIdx);' +
+          'var rect=sec.getBoundingClientRect();var mid=rect.top+rect.height/2;' +
+          'if(e.clientY>=mid)to++;' +
+          'parent.postMessage({type:"reorder-section",from:from,to:to},"*");' +
+        '});' +
+      '});' +
+      'window.addEventListener("message",function(e){' +
+        'if(e.data&&e.data.type==="highlight-section"){' +
+          'document.querySelectorAll("[data-section-idx]").forEach(function(s){s.classList.remove("le-selected")});' +
+          'var t=document.querySelector("[data-section-idx=\\""+e.data.idx+"\\"]");' +
+          'if(t){t.classList.add("le-selected");t.scrollIntoView({behavior:"smooth",block:"center"});}' +
+        '}' +
+      '});' +
+      '<\/script>';
+    html = html.replace('</body>', editScript + '</body>');
     frame.srcdoc = html;
     frame.onload = function() {
       document.getElementById('previewLoading').style.display = 'none';
@@ -621,10 +1114,71 @@ function refreshPreview() {
   });
 }
 
+// Listen for messages from preview iframe
+window.addEventListener('message', function(e) {
+  if (!e.data || !e.data.type) return;
+  if (e.data.type === 'select-section') {
+    selectSection(e.data.idx);
+  } else if (e.data.type === 'reorder-section') {
+    var from = e.data.from;
+    var to = e.data.to;
+    if (from === to || from < 0 || from >= sections.length) return;
+    pushHistory();
+    if (to > from) to--;
+    remapKeys(from, to);
+    var moved = sections.splice(from, 1)[0];
+    sections.splice(to, 0, moved);
+    if (selectedIdx === from) selectedIdx = to;
+    renderSectionList();
+    refreshPreview();
+  }
+});
+
+function highlightPreviewSection(idx) {
+  var frame = document.getElementById('previewFrame');
+  if (frame.contentWindow) {
+    frame.contentWindow.postMessage({ type: 'highlight-section', idx: idx }, '*');
+  }
+}
+
 function debouncedPreview() {
   clearTimeout(previewDebounce);
   previewDebounce = setTimeout(refreshPreview, 600);
 }
+
+// ═══════════════════════════════════════════════════════
+// CANVAS DROP (drag from component library to preview)
+// ═══════════════════════════════════════════════════════
+var previewArea = document.getElementById('lePreviewArea');
+var canvasOverlay = document.getElementById('canvasDropOverlay');
+
+previewArea.addEventListener('dragover', function(e) {
+  var blockType = e.dataTransfer.types.indexOf('block-type') >= 0 ||
+                  (e.dataTransfer.getData && e.dataTransfer.types.indexOf('text/plain') >= 0);
+  if (blockType) {
+    e.preventDefault();
+    canvasOverlay.style.display = 'flex';
+  }
+});
+previewArea.addEventListener('dragleave', function(e) {
+  if (!previewArea.contains(e.relatedTarget)) {
+    canvasOverlay.style.display = 'none';
+  }
+});
+previewArea.addEventListener('drop', function(e) {
+  e.preventDefault();
+  canvasOverlay.style.display = 'none';
+  var blockType = e.dataTransfer.getData('block-type');
+  if (blockType && blockLabels[blockType]) {
+    pushHistory();
+    sections.push(blockType);
+    selectedIdx = sections.length - 1;
+    renderSectionList();
+    renderContentPanel();
+    renderStylePanel();
+    refreshPreview();
+  }
+});
 
 // ═══════════════════════════════════════════════════════
 // RESPONSIVE PREVIEW
@@ -665,20 +1219,27 @@ document.querySelectorAll('.le-comp-item').forEach(function(item) {
   });
 });
 
-// Also allow drop on the preview area to add sections
-var previewArea = document.getElementById('lePreviewArea');
-previewArea.addEventListener('dragover', function(e) { e.preventDefault(); });
-previewArea.addEventListener('drop', function(e) {
-  e.preventDefault();
-  var blockType = e.dataTransfer.getData('block-type');
-  if (blockType && blockLabels[blockType]) {
-    sections.push(blockType);
-    selectedIdx = sections.length - 1;
-    renderSectionList();
-    renderContentPanel();
-    renderStylePanel();
-    refreshPreview();
+// ═══════════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════════════
+document.addEventListener('keydown', function(e) {
+  // Don't handle shortcuts when typing in inputs
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+    if (e.key === 'Escape') e.target.blur();
+    return;
   }
+  var ctrl = e.ctrlKey || e.metaKey;
+
+  if (ctrl && e.key === 'z') { e.preventDefault(); undo(); }
+  else if (ctrl && e.key === 'y') { e.preventDefault(); redo(); }
+  else if (ctrl && e.key === 's') { e.preventDefault(); saveDraft(); }
+  else if (ctrl && e.shiftKey && (e.key === 'p' || e.key === 'P')) { e.preventDefault(); publishLayout(); }
+  else if (ctrl && (e.key === 'd' || e.key === 'D') && selectedIdx >= 0) { e.preventDefault(); duplicateSection(selectedIdx, {stopPropagation:function(){}}); }
+  else if (e.key === 'Delete' && selectedIdx >= 0) { removeSection(selectedIdx, {stopPropagation:function(){}}); }
+  else if (ctrl && e.key === 'ArrowUp') { e.preventDefault(); moveSectionUp(); }
+  else if (ctrl && e.key === 'ArrowDown') { e.preventDefault(); moveSectionDown(); }
+  else if (e.key === 'Escape') { selectedIdx = -1; renderSectionList(); renderContentPanel(); renderStylePanel(); }
+  else if (e.key === '?') { document.getElementById('shortcutsModal').style.display = 'flex'; }
 });
 
 // ═══════════════════════════════════════════════════════
@@ -721,6 +1282,11 @@ function discardDraft() {
     }
   }).catch(function() { showToast('Error discarding draft', 'error'); });
 }
+
+// Auto-save every 60 seconds
+setInterval(function() {
+  if (sections.length > 0) saveDraft();
+}, 60000);
 
 // ═══════════════════════════════════════════════════════
 // INIT
