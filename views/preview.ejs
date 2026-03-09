@@ -14,57 +14,18 @@
       <% if (vis.hidden) { %>
         [data-section-idx="<%= idx %>"] { display: none !important; }
       <% } %>
-      <% if (Object.keys(st).length > 0) { %>
+      <% if (st.bgColor || st.textColor || st.paddingTop || st.paddingBottom || st.fontSize || st.fontFamily || st.bgImage) { %>
         [data-section-idx="<%= idx %>"] {
           <% if (st.bgColor) { %>background-color: <%= st.bgColor %> !important;<% } %>
           <% if (st.textColor) { %>color: <%= st.textColor %> !important;<% } %>
           <% if (st.paddingTop) { %>padding-top: <%= st.paddingTop %>px !important;<% } %>
           <% if (st.paddingBottom) { %>padding-bottom: <%= st.paddingBottom %>px !important;<% } %>
-          <% if (st.paddingLeft) { %>padding-left: <%= st.paddingLeft %>px !important;<% } %>
-          <% if (st.paddingRight) { %>padding-right: <%= st.paddingRight %>px !important;<% } %>
-          <% if (st.marginTop) { %>margin-top: <%= st.marginTop %>px !important;<% } %>
-          <% if (st.marginBottom) { %>margin-bottom: <%= st.marginBottom %>px !important;<% } %>
-          <% if (st.marginLeft) { %>margin-left: <%= st.marginLeft %>px !important;<% } %>
-          <% if (st.marginRight) { %>margin-right: <%= st.marginRight %>px !important;<% } %>
           <% if (st.fontSize) { %>font-size: <%= st.fontSize %>px !important;<% } %>
           <% if (st.fontFamily) { %>font-family: '<%= st.fontFamily %>', sans-serif !important;<% } %>
-          <% if (st.fontWeight) { %>font-weight: <%= st.fontWeight %> !important;<% } %>
-          <% if (st.textAlign) { %>text-align: <%= st.textAlign %> !important;<% } %>
-          <% if (st.letterSpacing) { %>letter-spacing: <%= st.letterSpacing %>px !important;<% } %>
-          <% if (st.lineHeight) { %>line-height: <%= st.lineHeight %> !important;<% } %>
-          <% if (st.bgImage) { %>background-image: url('<%= st.bgImage %>') !important; background-size: <%= st.bgSize || 'cover' %>; background-position: <%= st.bgPosition || 'center' %>;<% } %>
-          <% if (st.borderRadius) { %>border-radius: <%= st.borderRadius %>px !important;<% } %>
-          <% if (st.borderWidth) { %>border: <%= st.borderWidth %>px solid <%= st.borderColor || '#e0ddd8' %> !important;<% } %>
-          <% if (st.boxShadow) { %>box-shadow: <%= st.boxShadow %> !important;<% } %>
-          <% if (st.opacity && st.opacity !== '100') { %>opacity: <%= parseInt(st.opacity) / 100 %> !important;<% } %>
-          <% if (st.maxWidth) { %>max-width: <%= st.maxWidth %> !important; margin-left: auto !important; margin-right: auto !important;<% } %>
-          <% if (st.bgOverlay && st.bgOverlay !== '0') { %>position: relative;<% } %>
+          <% if (st.bgImage) { %>background-image: url('<%= st.bgImage %>') !important; background-size: cover; background-position: center;<% } %>
         }
-        <% if (st.bgOverlay && st.bgOverlay !== '0') { %>
-        [data-section-idx="<%= idx %>"]::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: rgba(0,0,0,<%= parseInt(st.bgOverlay) / 100 %>);
-          pointer-events: none;
-          z-index: 0;
-        }
-        [data-section-idx="<%= idx %>"] > * { position: relative; z-index: 1; }
-        <% } %>
-        <% if (st.animation) { %>
-        [data-section-idx="<%= idx %>"] {
-          animation: le-<%= st.animation %> 0.6s ease-out both;
-        }
-        <% } %>
       <% } %>
     <% }); %>
-    /* Entrance animations */
-    @keyframes le-fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes le-slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes le-slideLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
-    @keyframes le-slideRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-    @keyframes le-zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-    @keyframes le-bounce { 0% { opacity: 0; transform: translateY(30px); } 60% { opacity: 1; transform: translateY(-5px); } 100% { transform: translateY(0); } }
   </style>
 </head>
 <body>

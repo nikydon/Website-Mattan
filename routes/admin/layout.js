@@ -62,7 +62,6 @@ router.get('/', async (req, res) => {
     sectionStyles: hasDraft ? (draftStyles || sectionStyles) : sectionStyles,
     sectionVisibility: hasDraft ? (draftVisibility || sectionVisibility) : sectionVisibility,
     hasDraft,
-    tenantId: tenant.id,
   });
 });
 
