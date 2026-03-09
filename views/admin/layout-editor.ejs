@@ -5,7 +5,7 @@
   <!-- Top Toolbar -->
   <div class="le-toolbar">
     <div class="le-toolbar-left">
-      <a href="/admin" class="le-back-btn">
+      <a href="/admin" class="le-back-btn" title="Back to Dashboard">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
       </a>
       <h1 class="le-toolbar-title">Layout Editor</h1>
@@ -14,17 +14,13 @@
       <% } %>
     </div>
     <div class="le-toolbar-center">
-      <!-- Undo / Redo -->
-      <div class="le-history-btns">
-        <button class="le-tool-btn" id="undoBtn" onclick="undo()" title="Undo (Ctrl+Z)" disabled>
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 10h10a5 5 0 015 5v2M3 10l4-4M3 10l4 4"/></svg>
-        </button>
-        <button class="le-tool-btn" id="redoBtn" onclick="redo()" title="Redo (Ctrl+Y)" disabled>
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 10H11a5 5 0 00-5 5v2M21 10l-4-4M21 10l-4 4"/></svg>
-        </button>
-      </div>
+      <button class="le-tool-btn" id="undoBtn" onclick="undo()" title="Undo (Ctrl+Z)" disabled>
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 10h10a5 5 0 015 5v2M3 10l4-4M3 10l4 4"/></svg>
+      </button>
+      <button class="le-tool-btn" id="redoBtn" onclick="redo()" title="Redo (Ctrl+Y)" disabled>
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 10H11a5 5 0 00-5 5v2M21 10l-4-4M21 10l-4 4"/></svg>
+      </button>
       <div class="le-toolbar-sep"></div>
-      <!-- Responsive Preview Controls -->
       <div class="le-device-switcher">
         <button class="le-device-btn active" data-device="desktop" title="Desktop">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
@@ -36,22 +32,11 @@
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
         </button>
       </div>
-      <div class="le-toolbar-sep"></div>
-      <!-- Zoom -->
-      <div class="le-zoom-controls">
-        <button class="le-tool-btn" onclick="changeZoom(-10)" title="Zoom Out">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M8 11h6"/></svg>
-        </button>
-        <span class="le-zoom-label" id="zoomLabel">100%</span>
-        <button class="le-tool-btn" onclick="changeZoom(10)" title="Zoom In">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M8 11h6M11 8v6"/></svg>
-        </button>
-      </div>
     </div>
     <div class="le-toolbar-right">
-      <button class="btn" onclick="discardDraft()">Discard</button>
-      <button class="btn" onclick="saveDraft()">Save Draft</button>
-      <button class="btn btn--primary" onclick="publishLayout()">
+      <button class="le-text-btn" onclick="discardDraft()">Discard</button>
+      <button class="le-text-btn" onclick="saveDraft()">Save Draft</button>
+      <button class="le-publish-btn" onclick="publishLayout()">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
         Publish
       </button>
@@ -59,112 +44,23 @@
   </div>
 
   <div class="le-workspace">
-    <!-- Left Panel: Components + Sections -->
+    <!-- Left Panel: Sections List -->
     <div class="le-left-panel" id="leLeftPanel">
-      <div class="le-panel-tabs">
-        <button class="le-tab active" data-tab="sections">Sections</button>
-        <button class="le-tab" data-tab="components">Components</button>
+      <div class="le-panel-header">
+        <span class="le-panel-title">Sections</span>
+        <button class="le-add-btn" id="addSectionBtn" onclick="toggleComponentPicker()" title="Add section">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg>
+        </button>
       </div>
+      <div class="le-section-list" id="sectionList"></div>
 
-      <!-- Sections Tab: Current Layout -->
-      <div class="le-tab-content active" id="tab-sections">
-        <div class="le-section-list" id="sectionList"></div>
-      </div>
-
-      <!-- Components Tab: Drag-and-Drop Library -->
-      <div class="le-tab-content" id="tab-components">
-        <!-- Search -->
-        <div class="le-comp-search">
-          <input type="text" id="compSearch" class="le-field-input" placeholder="Search components..." oninput="filterComponents(this.value)">
+      <!-- Component Picker Dropdown -->
+      <div class="le-picker" id="componentPicker" style="display:none;">
+        <div class="le-picker-search">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="compSearch" placeholder="Search components..." oninput="filterComponents(this.value)">
         </div>
-
-        <div class="le-component-group">
-          <h4 class="le-group-title">Content</h4>
-          <div class="le-comp-item" draggable="true" data-block="hero">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"/></svg>
-            <div><strong>Hero Banner</strong><small>Full-width hero with CTA</small></div>
-          </div>
-          <div class="le-comp-item" draggable="true" data-block="text-block">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
-            <div><strong>Text Block</strong><small>Rich text content area</small></div>
-          </div>
-          <div class="le-comp-item" draggable="true" data-block="banner">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            <div><strong>Image Banner</strong><small>Promotional banner with image</small></div>
-          </div>
-          <div class="le-comp-item" draggable="true" data-block="video">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            <div><strong>Video</strong><small>YouTube, Vimeo, or direct</small></div>
-          </div>
-          <div class="le-comp-item" draggable="true" data-block="cta-strip">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            <div><strong>CTA Strip</strong><small>Call-to-action bar</small></div>
-          </div>
-        </div>
-
-        <div class="le-component-group">
-          <h4 class="le-group-title">Commerce</h4>
-          <div class="le-comp-item" draggable="true" data-block="featured-products">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-            <div><strong>Featured Products</strong><small>Product showcase grid</small></div>
-          </div>
-          <div class="le-comp-item" draggable="true" data-block="collections-grid">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-            <div><strong>Collections Grid</strong><small>Browse all collections</small></div>
-          </div>
-          <div class="le-comp-item" draggable="true" data-block="countdown">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            <div><strong>Countdown</strong><small>Timer for launches/sales</small></div>
-          </div>
-        </div>
-
-        <div class="le-component-group">
-          <h4 class="le-group-title">Social Proof</h4>
-          <div class="le-comp-item" draggable="true" data-block="testimonials">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-            <div><strong>Testimonials</strong><small>Customer reviews</small></div>
-          </div>
-          <div class="le-comp-item" draggable="true" data-block="logo-bar">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-            <div><strong>Logo Bar</strong><small>Partner/press logos</small></div>
-          </div>
-          <div class="le-comp-item" draggable="true" data-block="social-feed">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/></svg>
-            <div><strong>Social Links</strong><small>Instagram, TikTok links</small></div>
-          </div>
-        </div>
-
-        <div class="le-component-group">
-          <h4 class="le-group-title">Layout & Info</h4>
-          <div class="le-comp-item" draggable="true" data-block="brand-story">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-            <div><strong>Brand Story</strong><small>About your brand</small></div>
-          </div>
-          <div class="le-comp-item" draggable="true" data-block="newsletter">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            <div><strong>Newsletter</strong><small>Email signup form</small></div>
-          </div>
-          <div class="le-comp-item" draggable="true" data-block="news-feed">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2"/></svg>
-            <div><strong>News Feed</strong><small>Latest news posts</small></div>
-          </div>
-          <div class="le-comp-item" draggable="true" data-block="faq">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3m.08 4h.01"/></svg>
-            <div><strong>FAQ</strong><small>Questions &amp; answers</small></div>
-          </div>
-          <div class="le-comp-item" draggable="true" data-block="gallery">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-            <div><strong>Gallery</strong><small>Image grid gallery</small></div>
-          </div>
-          <div class="le-comp-item" draggable="true" data-block="features-grid">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
-            <div><strong>Features Grid</strong><small>Feature highlights</small></div>
-          </div>
-          <div class="le-comp-item" draggable="true" data-block="divider">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14"/></svg>
-            <div><strong>Divider</strong><small>Visual separator</small></div>
-          </div>
-        </div>
+        <div class="le-picker-list" id="pickerList"></div>
       </div>
     </div>
 
@@ -185,7 +81,7 @@
       </div>
     </div>
 
-    <!-- Right Panel: Properties/Styles -->
+    <!-- Right Panel: Properties -->
     <div class="le-right-panel" id="leRightPanel">
       <div class="le-panel-tabs">
         <button class="le-tab active" data-tab="content-edit">Content</button>
@@ -195,7 +91,7 @@
       <div class="le-tab-content active" id="tab-content-edit">
         <div class="le-no-selection" id="contentNoSelection">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
-          <p>Select a section to edit its content.</p>
+          <p>Click a section to edit</p>
         </div>
         <div id="contentEditFields" style="display:none;"></div>
       </div>
@@ -203,7 +99,7 @@
       <div class="le-tab-content" id="tab-style-edit">
         <div class="le-no-selection" id="styleNoSelection">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
-          <p>Select a section to adjust its styling.</p>
+          <p>Click a section to style</p>
         </div>
         <div id="styleEditFields" style="display:none;"></div>
       </div>
@@ -268,8 +164,9 @@ var sectionStyles = <%- JSON.stringify(sectionStyles) %>;
 var sectionVisibility = <%- JSON.stringify(sectionVisibility) %>;
 var selectedIdx = -1;
 var previewDebounce = null;
-var zoomLevel = 100;
 var imageUploadCallback = null;
+var pickerOpen = false;
+var insertAtIdx = -1; // Where to insert new section (-1 = end)
 
 // Undo/Redo history
 var historyStack = [];
@@ -290,10 +187,7 @@ function pushHistory() {
   historyIdx++;
   historyStack = historyStack.slice(0, historyIdx);
   historyStack.push(cloneState());
-  if (historyStack.length > maxHistory) {
-    historyStack.shift();
-    historyIdx--;
-  }
+  if (historyStack.length > maxHistory) { historyStack.shift(); historyIdx--; }
   updateHistoryBtns();
 }
 
@@ -327,7 +221,6 @@ function updateHistoryBtns() {
   document.getElementById('redoBtn').disabled = historyIdx >= historyStack.length - 1;
 }
 
-// Initialize history with initial state
 pushHistory();
 
 var blockLabels = {
@@ -338,6 +231,34 @@ var blockLabels = {
   'social-feed': 'Social Links', 'divider': 'Divider', 'features-grid': 'Features Grid',
   'cta-strip': 'CTA Strip', 'logo-bar': 'Logo Bar'
 };
+
+var blockIcons = {
+  'hero': '<path d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"/>',
+  'text-block': '<path d="M4 6h16M4 12h16M4 18h7"/>',
+  'banner': '<path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>',
+  'video': '<polygon points="5 3 19 12 5 21 5 3"/>',
+  'cta-strip': '<path d="M13 10V3L4 14h7v7l9-11h-7z"/>',
+  'featured-products': '<path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>',
+  'collections-grid': '<path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>',
+  'countdown': '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  'testimonials': '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>',
+  'logo-bar': '<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>',
+  'social-feed': '<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/>',
+  'brand-story': '<path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>',
+  'newsletter': '<path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>',
+  'news-feed': '<path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2"/>',
+  'faq': '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3m.08 4h.01"/>',
+  'gallery': '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
+  'features-grid': '<path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>',
+  'divider': '<path d="M5 12h14"/>'
+};
+
+var blockCategories = [
+  { name: 'Content', items: ['hero', 'text-block', 'banner', 'video', 'cta-strip'] },
+  { name: 'Commerce', items: ['featured-products', 'collections-grid', 'countdown'] },
+  { name: 'Social Proof', items: ['testimonials', 'logo-bar', 'social-feed'] },
+  { name: 'Layout & Info', items: ['brand-story', 'newsletter', 'news-feed', 'faq', 'gallery', 'features-grid', 'divider'] }
+];
 
 var blockFields = {
   'hero': [
@@ -426,32 +347,95 @@ var blockFields = {
 };
 
 // ═══════════════════════════════════════════════════════
-// COMPONENT SEARCH
+// COMPONENT PICKER
 // ═══════════════════════════════════════════════════════
-function filterComponents(query) {
-  var q = query.toLowerCase();
-  document.querySelectorAll('.le-comp-item').forEach(function(item) {
-    var text = item.textContent.toLowerCase();
-    item.style.display = text.indexOf(q) >= 0 ? '' : 'none';
+function buildPickerList() {
+  var list = document.getElementById('pickerList');
+  var html = '';
+  blockCategories.forEach(function(cat) {
+    html += '<div class="le-picker-group" data-group="' + cat.name + '">';
+    html += '<div class="le-picker-group-label">' + cat.name + '</div>';
+    cat.items.forEach(function(block) {
+      html += '<button class="le-picker-item" data-block="' + block + '" onclick="addSection(\'' + block + '\')" draggable="true">' +
+        '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">' + (blockIcons[block] || '') + '</svg>' +
+        '<span>' + blockLabels[block] + '</span>' +
+        '</button>';
+    });
+    html += '</div>';
   });
-  document.querySelectorAll('.le-component-group').forEach(function(group) {
-    var visibleItems = group.querySelectorAll('.le-comp-item:not([style*="display: none"])');
-    group.style.display = visibleItems.length > 0 ? '' : 'none';
+  list.innerHTML = html;
+
+  // Enable drag from picker
+  list.querySelectorAll('.le-picker-item').forEach(function(item) {
+    item.addEventListener('dragstart', function(e) {
+      e.dataTransfer.setData('block-type', item.dataset.block);
+      e.dataTransfer.effectAllowed = 'copy';
+    });
   });
 }
 
-// ═══════════════════════════════════════════════════════
-// ZOOM
-// ═══════════════════════════════════════════════════════
-function changeZoom(delta) {
-  zoomLevel = Math.min(150, Math.max(50, zoomLevel + delta));
-  document.getElementById('zoomLabel').textContent = zoomLevel + '%';
-  var frame = document.getElementById('previewFrame');
-  frame.style.transform = 'scale(' + (zoomLevel / 100) + ')';
-  frame.style.transformOrigin = 'top center';
-  frame.style.width = (10000 / zoomLevel) + '%';
-  frame.style.height = (10000 / zoomLevel) + '%';
+function toggleComponentPicker() {
+  insertAtIdx = -1;
+  var picker = document.getElementById('componentPicker');
+  pickerOpen = !pickerOpen;
+  picker.style.display = pickerOpen ? '' : 'none';
+  if (pickerOpen) {
+    document.getElementById('compSearch').value = '';
+    filterComponents('');
+    document.getElementById('compSearch').focus();
+  }
 }
+
+function openPickerAtIndex(idx) {
+  insertAtIdx = idx;
+  var picker = document.getElementById('componentPicker');
+  pickerOpen = true;
+  picker.style.display = '';
+  document.getElementById('compSearch').value = '';
+  filterComponents('');
+  document.getElementById('compSearch').focus();
+}
+
+function closePicker() {
+  pickerOpen = false;
+  document.getElementById('componentPicker').style.display = 'none';
+  insertAtIdx = -1;
+}
+
+function addSection(blockType) {
+  pushHistory();
+  if (insertAtIdx >= 0) {
+    sections.splice(insertAtIdx, 0, blockType);
+    selectedIdx = insertAtIdx;
+  } else {
+    sections.push(blockType);
+    selectedIdx = sections.length - 1;
+  }
+  closePicker();
+  renderSectionList();
+  renderContentPanel();
+  renderStylePanel();
+  refreshPreview();
+}
+
+function filterComponents(query) {
+  var q = query.toLowerCase();
+  document.querySelectorAll('.le-picker-item').forEach(function(item) {
+    var text = item.textContent.toLowerCase();
+    item.style.display = text.indexOf(q) >= 0 ? '' : 'none';
+  });
+  document.querySelectorAll('.le-picker-group').forEach(function(group) {
+    var visible = group.querySelectorAll('.le-picker-item:not([style*="display: none"])');
+    group.style.display = visible.length > 0 ? '' : 'none';
+  });
+}
+
+// Close picker when clicking outside
+document.addEventListener('click', function(e) {
+  if (pickerOpen && !e.target.closest('.le-picker') && !e.target.closest('.le-add-btn') && !e.target.closest('.le-insert-btn')) {
+    closePicker();
+  }
+});
 
 // ═══════════════════════════════════════════════════════
 // SECTION LIST (LEFT PANEL)
@@ -459,21 +443,32 @@ function changeZoom(delta) {
 var sectionList = document.getElementById('sectionList');
 var dragSrcEl = null;
 
-function getVisKey(section, idx) {
-  return section + '-' + idx;
-}
+function getVisKey(section, idx) { return section + '-' + idx; }
 
 function renderSectionList() {
   sectionList.innerHTML = '';
   if (sections.length === 0) {
-    sectionList.innerHTML = '<div class="le-empty-msg">Drag components from the library to add sections.</div>';
+    sectionList.innerHTML = '<div class="le-empty">' +
+      '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 4v16m8-8H4"/></svg>' +
+      '<p>No sections yet</p>' +
+      '<button class="le-empty-btn" onclick="toggleComponentPicker()">Add your first section</button>' +
+      '</div>';
     return;
   }
+
   sections.forEach(function(s, i) {
     var vk = getVisKey(s, i);
     var vis = sectionVisibility[vk] || {};
     var isHidden = vis.hidden;
     var isSelected = selectedIdx === i;
+
+    // Insert-between button
+    if (i === 0) {
+      var insertTop = document.createElement('div');
+      insertTop.className = 'le-insert-line';
+      insertTop.innerHTML = '<button class="le-insert-btn" onclick="openPickerAtIndex(0)" title="Insert section here"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg></button>';
+      sectionList.appendChild(insertTop);
+    }
 
     var el = document.createElement('div');
     el.className = 'le-section-item' + (isSelected ? ' selected' : '') + (isHidden ? ' hidden-section' : '');
@@ -481,23 +476,24 @@ function renderSectionList() {
     el.dataset.index = i;
 
     el.innerHTML =
-      '<span class="le-section-drag"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 8h16M4 16h16"/></svg></span>' +
+      '<span class="le-section-drag" title="Drag to reorder"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 8h16M4 16h16"/></svg></span>' +
+      '<svg class="le-section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">' + (blockIcons[s] || '') + '</svg>' +
       '<span class="le-section-label">' + (blockLabels[s] || s) + '</span>' +
-      '<div class="le-section-btns">' +
-        '<button class="le-icon-btn" onclick="duplicateSection(' + i + ', event)" title="Duplicate">' +
-          '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>' +
-        '</button>' +
-        '<button class="le-icon-btn' + (isHidden ? ' le-toggled-off' : '') + '" onclick="toggleVisibility(' + i + ', event)" title="' + (isHidden ? 'Show' : 'Hide') + '">' +
+      '<div class="le-section-actions">' +
+        '<button class="le-act-btn" onclick="toggleVisibility(' + i + ', event)" title="' + (isHidden ? 'Show' : 'Hide') + '">' +
           (isHidden ? '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M3 3l18 18"/></svg>'
                     : '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>') +
         '</button>' +
-        '<button class="le-icon-btn le-remove-btn" onclick="removeSection(' + i + ', event)" title="Remove">' +
+        '<button class="le-act-btn" onclick="duplicateSection(' + i + ', event)" title="Duplicate">' +
+          '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>' +
+        '</button>' +
+        '<button class="le-act-btn le-act-danger" onclick="removeSection(' + i + ', event)" title="Remove">' +
           '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>' +
         '</button>' +
       '</div>';
 
     el.addEventListener('click', function(e) {
-      if (e.target.closest('.le-icon-btn')) return;
+      if (e.target.closest('.le-act-btn') || e.target.closest('.le-insert-btn')) return;
       selectSection(i);
     });
 
@@ -548,6 +544,12 @@ function renderSectionList() {
     });
 
     sectionList.appendChild(el);
+
+    // Insert-between button after each section
+    var insertLine = document.createElement('div');
+    insertLine.className = 'le-insert-line';
+    insertLine.innerHTML = '<button class="le-insert-btn" onclick="openPickerAtIndex(' + (i + 1) + ')" title="Insert section here"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg></button>';
+    sectionList.appendChild(insertLine);
   });
 }
 
@@ -622,7 +624,6 @@ function duplicateSection(idx, e) {
   var s = sections[idx];
   var newIdx = idx + 1;
   sections.splice(newIdx, 0, s);
-  // Copy styles and visibility
   var oldVk = getVisKey(s, idx);
   var newVk = getVisKey(s, newIdx);
   if (sectionStyles[oldVk]) sectionStyles[newVk] = JSON.parse(JSON.stringify(sectionStyles[oldVk]));
@@ -637,8 +638,7 @@ function duplicateSection(idx, e) {
 function moveSectionUp() {
   if (selectedIdx <= 0) return;
   pushHistory();
-  var fromIdx = selectedIdx;
-  var toIdx = selectedIdx - 1;
+  var fromIdx = selectedIdx, toIdx = selectedIdx - 1;
   remapKeys(fromIdx, toIdx);
   var moved = sections.splice(fromIdx, 1)[0];
   sections.splice(toIdx, 0, moved);
@@ -650,8 +650,7 @@ function moveSectionUp() {
 function moveSectionDown() {
   if (selectedIdx < 0 || selectedIdx >= sections.length - 1) return;
   pushHistory();
-  var fromIdx = selectedIdx;
-  var toIdx = selectedIdx + 1;
+  var fromIdx = selectedIdx, toIdx = selectedIdx + 1;
   remapKeys(fromIdx, toIdx);
   var moved = sections.splice(fromIdx, 1)[0];
   sections.splice(toIdx, 0, moved);
@@ -678,9 +677,12 @@ function renderContentPanel() {
   var content = sectionContent[s] || {};
   var defs = blockFields[s] || [];
 
-  var html = '<h3 class="le-props-title">' + (blockLabels[s] || s) + '</h3>';
+  var html = '<div class="le-props-header">' +
+    '<svg class="le-props-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">' + (blockIcons[s] || '') + '</svg>' +
+    '<h3 class="le-props-title">' + (blockLabels[s] || s) + '</h3></div>';
+
   if (defs.length === 0) {
-    html += '<p class="le-props-note">This section has no editable content fields.</p>';
+    html += '<p class="le-props-note">No editable content fields.</p>';
   } else {
     defs.forEach(function(f) {
       var val = content[f.key] || '';
@@ -714,10 +716,8 @@ function renderContentPanel() {
   }
   fields.innerHTML = html;
 
-  // Attach input handlers
   fields.querySelectorAll('.le-field-input, .le-field-select').forEach(function(input) {
-    var evts = ['input'];
-    if (input.tagName === 'SELECT') evts = ['change'];
+    var evts = input.tagName === 'SELECT' ? ['change'] : ['input'];
     evts.forEach(function(evt) {
       input.addEventListener(evt, function() {
         var sec = this.dataset.section;
@@ -732,7 +732,7 @@ function renderContentPanel() {
 }
 
 // ═══════════════════════════════════════════════════════
-// STYLE PANEL (RIGHT) - ENHANCED
+// STYLE PANEL (RIGHT)
 // ═══════════════════════════════════════════════════════
 function renderStylePanel() {
   var noSel = document.getElementById('styleNoSelection');
@@ -749,59 +749,45 @@ function renderStylePanel() {
   var vk = getVisKey(s, selectedIdx);
   var st = sectionStyles[vk] || {};
 
-  var html = '<h3 class="le-props-title">Style: ' + (blockLabels[s] || s) + '</h3>';
+  var html = '';
 
-  // --- Colors ---
+  // Colors
   html += '<div class="le-style-group"><div class="le-style-group-title" onclick="toggleStyleGroup(this)"><span>Colors</span><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></div><div class="le-style-group-body">';
-  html += colorField('Background Color', 'bgColor', st.bgColor, '#ffffff');
-  html += colorField('Text Color', 'textColor', st.textColor, '#1a1a1a');
+  html += colorField('Background', 'bgColor', st.bgColor, '#ffffff');
+  html += colorField('Text', 'textColor', st.textColor, '#1a1a1a');
   html += '</div></div>';
 
-  // --- Typography ---
+  // Typography
   html += '<div class="le-style-group"><div class="le-style-group-title" onclick="toggleStyleGroup(this)"><span>Typography</span><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></div><div class="le-style-group-body">';
   html += '<div class="le-field"><label class="le-field-label">Font Family</label>' +
-    '<select class="le-field-select" data-style-key="fontFamily">' +
-    '<option value="">Default</option>' +
+    '<select class="le-field-select" data-style-key="fontFamily"><option value="">Default</option>' +
     ['Inter','Georgia','Playfair Display','Roboto','Montserrat','Lora','Poppins','Raleway','Open Sans','Merriweather'].map(function(f) {
-      return '<option value="' + f + '"' + (st.fontFamily === f ? ' selected' : '') + ' style="font-family:' + f + '">' + f + '</option>';
-    }).join('') +
-    '</select></div>';
-  html += '<div class="le-field"><label class="le-field-label">Font Size (px)</label>' +
-    '<input type="number" class="le-field-input" data-style-key="fontSize" value="' + (st.fontSize || '') + '" placeholder="16" min="10" max="120"></div>';
-  html += '<div class="le-field"><label class="le-field-label">Font Weight</label>' +
-    '<select class="le-field-select" data-style-key="fontWeight">' +
-    '<option value="">Default</option>' +
-    [{v:'300',l:'Light'},{v:'400',l:'Normal'},{v:'500',l:'Medium'},{v:'600',l:'Semibold'},{v:'700',l:'Bold'},{v:'800',l:'Extra Bold'}].map(function(o) {
+      return '<option value="' + f + '"' + (st.fontFamily === f ? ' selected' : '') + '>' + f + '</option>';
+    }).join('') + '</select></div>';
+  html += '<div class="le-field-row">' +
+    '<div class="le-field"><label class="le-field-label">Size (px)</label><input type="number" class="le-field-input" data-style-key="fontSize" value="' + (st.fontSize || '') + '" placeholder="16" min="10" max="120"></div>' +
+    '<div class="le-field"><label class="le-field-label">Weight</label><select class="le-field-select" data-style-key="fontWeight"><option value="">Default</option>' +
+    [{v:'300',l:'Light'},{v:'400',l:'Normal'},{v:'500',l:'Medium'},{v:'600',l:'Semi'},{v:'700',l:'Bold'}].map(function(o) {
       return '<option value="' + o.v + '"' + (st.fontWeight === o.v ? ' selected' : '') + '>' + o.l + '</option>';
-    }).join('') +
-    '</select></div>';
-  html += '<div class="le-field"><label class="le-field-label">Text Align</label>' +
+    }).join('') + '</select></div></div>';
+  html += '<div class="le-field"><label class="le-field-label">Align</label>' +
     '<div class="le-btn-group">' +
     [{v:'left',icon:'M4 6h16M4 12h10M4 18h16'},{v:'center',icon:'M4 6h16M7 12h10M4 18h16'},{v:'right',icon:'M4 6h16M10 12h10M4 18h16'}].map(function(o) {
       return '<button class="le-btn-group-item' + (st.textAlign === o.v ? ' active' : '') + '" data-style-key="textAlign" data-val="' + o.v + '" onclick="setStyleGroupVal(this)" title="' + o.v + '">' +
         '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="' + o.icon + '"/></svg></button>';
-    }).join('') +
-    '</div></div>';
-  html += '<div class="le-field"><label class="le-field-label">Letter Spacing (px)</label>' +
-    '<input type="number" class="le-field-input" data-style-key="letterSpacing" value="' + (st.letterSpacing || '') + '" placeholder="0" min="-2" max="20" step="0.5"></div>';
-  html += '<div class="le-field"><label class="le-field-label">Line Height</label>' +
-    '<input type="number" class="le-field-input" data-style-key="lineHeight" value="' + (st.lineHeight || '') + '" placeholder="1.6" min="0.8" max="3" step="0.1"></div>';
+    }).join('') + '</div></div>';
   html += '</div></div>';
 
-  // --- Spacing ---
+  // Spacing
   html += '<div class="le-style-group"><div class="le-style-group-title" onclick="toggleStyleGroup(this)"><span>Spacing</span><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></div><div class="le-style-group-body">';
-  html += '<div class="le-spacing-box">' +
-    '<div class="le-spacing-label">Padding</div>' +
-    '<div class="le-spacing-grid">' +
+  html += '<div class="le-spacing-box"><div class="le-spacing-label">Padding</div><div class="le-spacing-grid">' +
     '<div></div><input type="number" class="le-spacing-input" data-style-key="paddingTop" value="' + (st.paddingTop || '') + '" placeholder="64" title="Top"><div></div>' +
     '<input type="number" class="le-spacing-input" data-style-key="paddingLeft" value="' + (st.paddingLeft || '') + '" placeholder="0" title="Left">' +
     '<div class="le-spacing-center">px</div>' +
     '<input type="number" class="le-spacing-input" data-style-key="paddingRight" value="' + (st.paddingRight || '') + '" placeholder="0" title="Right">' +
     '<div></div><input type="number" class="le-spacing-input" data-style-key="paddingBottom" value="' + (st.paddingBottom || '') + '" placeholder="64" title="Bottom"><div></div>' +
     '</div></div>';
-  html += '<div class="le-spacing-box">' +
-    '<div class="le-spacing-label">Margin</div>' +
-    '<div class="le-spacing-grid">' +
+  html += '<div class="le-spacing-box"><div class="le-spacing-label">Margin</div><div class="le-spacing-grid">' +
     '<div></div><input type="number" class="le-spacing-input" data-style-key="marginTop" value="' + (st.marginTop || '') + '" placeholder="0" title="Top"><div></div>' +
     '<input type="number" class="le-spacing-input" data-style-key="marginLeft" value="' + (st.marginLeft || '') + '" placeholder="0" title="Left">' +
     '<div class="le-spacing-center">px</div>' +
@@ -810,83 +796,67 @@ function renderStylePanel() {
     '</div></div>';
   html += '</div></div>';
 
-  // --- Background ---
+  // Background
   html += '<div class="le-style-group"><div class="le-style-group-title" onclick="toggleStyleGroup(this)"><span>Background</span><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></div><div class="le-style-group-body">';
-  html += '<div class="le-field"><label class="le-field-label">Background Image URL</label>' +
+  html += '<div class="le-field"><label class="le-field-label">Image URL</label>' +
     '<div class="le-image-field"><input type="text" class="le-field-input" data-style-key="bgImage" value="' + (st.bgImage || '') + '" placeholder="/uploads/bg.jpg">' +
     '<button class="le-upload-btn" onclick="openImageUploadForStyle(\'bgImage\')" title="Upload">' +
-    '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>' +
-    '</button></div></div>';
-  html += '<div class="le-field"><label class="le-field-label">Background Size</label>' +
-    '<select class="le-field-select" data-style-key="bgSize">' +
-    ['','cover','contain','auto','100% 100%'].map(function(v) {
-      return '<option value="' + v + '"' + (st.bgSize === v ? ' selected' : '') + '>' + (v || 'Default') + '</option>';
-    }).join('') +
-    '</select></div>';
-  html += '<div class="le-field"><label class="le-field-label">Background Position</label>' +
-    '<select class="le-field-select" data-style-key="bgPosition">' +
-    ['','center','top','bottom','left','right'].map(function(v) {
-      return '<option value="' + v + '"' + (st.bgPosition === v ? ' selected' : '') + '>' + (v || 'Default') + '</option>';
-    }).join('') +
-    '</select></div>';
-  html += '<div class="le-field"><label class="le-field-label">Background Overlay Opacity</label>' +
+    '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></button></div></div>';
+  html += '<div class="le-field-row">' +
+    '<div class="le-field"><label class="le-field-label">Size</label><select class="le-field-select" data-style-key="bgSize">' +
+    ['','cover','contain','auto'].map(function(v) { return '<option value="' + v + '"' + (st.bgSize === v ? ' selected' : '') + '>' + (v || 'Default') + '</option>'; }).join('') + '</select></div>' +
+    '<div class="le-field"><label class="le-field-label">Position</label><select class="le-field-select" data-style-key="bgPosition">' +
+    ['','center','top','bottom'].map(function(v) { return '<option value="' + v + '"' + (st.bgPosition === v ? ' selected' : '') + '>' + (v || 'Default') + '</option>'; }).join('') + '</select></div></div>';
+  html += '<div class="le-field"><label class="le-field-label">Overlay</label>' +
     '<input type="range" class="le-range-input" data-style-key="bgOverlay" value="' + (st.bgOverlay || '0') + '" min="0" max="100" step="5">' +
     '<span class="le-range-val">' + (st.bgOverlay || '0') + '%</span></div>';
   html += '</div></div>';
 
-  // --- Borders ---
-  html += '<div class="le-style-group"><div class="le-style-group-title" onclick="toggleStyleGroup(this)"><span>Border & Shadow</span><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></div><div class="le-style-group-body">';
-  html += '<div class="le-field"><label class="le-field-label">Border Radius (px)</label>' +
-    '<input type="number" class="le-field-input" data-style-key="borderRadius" value="' + (st.borderRadius || '') + '" placeholder="0" min="0" max="100"></div>';
-  html += '<div class="le-field"><label class="le-field-label">Border Width (px)</label>' +
-    '<input type="number" class="le-field-input" data-style-key="borderWidth" value="' + (st.borderWidth || '') + '" placeholder="0" min="0" max="20"></div>';
+  // Border & Shadow
+  html += '<div class="le-style-group collapsed"><div class="le-style-group-title" onclick="toggleStyleGroup(this)"><span>Border & Shadow</span><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></div><div class="le-style-group-body">';
+  html += '<div class="le-field-row">' +
+    '<div class="le-field"><label class="le-field-label">Radius (px)</label><input type="number" class="le-field-input" data-style-key="borderRadius" value="' + (st.borderRadius || '') + '" placeholder="0" min="0" max="100"></div>' +
+    '<div class="le-field"><label class="le-field-label">Width (px)</label><input type="number" class="le-field-input" data-style-key="borderWidth" value="' + (st.borderWidth || '') + '" placeholder="0" min="0" max="20"></div></div>';
   html += colorField('Border Color', 'borderColor', st.borderColor, '#e0ddd8');
-  html += '<div class="le-field"><label class="le-field-label">Box Shadow</label>' +
+  html += '<div class="le-field"><label class="le-field-label">Shadow</label>' +
     '<select class="le-field-select" data-style-key="boxShadow">' +
-    [{v:'',l:'None'},{v:'0 1px 3px rgba(0,0,0,0.1)',l:'Small'},{v:'0 4px 6px rgba(0,0,0,0.1)',l:'Medium'},{v:'0 10px 25px rgba(0,0,0,0.15)',l:'Large'},{v:'0 20px 50px rgba(0,0,0,0.2)',l:'Extra Large'},{v:'inset 0 2px 4px rgba(0,0,0,0.1)',l:'Inset'}].map(function(o) {
+    [{v:'',l:'None'},{v:'0 1px 3px rgba(0,0,0,0.1)',l:'Small'},{v:'0 4px 6px rgba(0,0,0,0.1)',l:'Medium'},{v:'0 10px 25px rgba(0,0,0,0.15)',l:'Large'}].map(function(o) {
       return '<option value="' + o.v + '"' + ((st.boxShadow || '') === o.v ? ' selected' : '') + '>' + o.l + '</option>';
-    }).join('') +
-    '</select></div>';
+    }).join('') + '</select></div>';
   html += '</div></div>';
 
-  // --- Effects ---
-  html += '<div class="le-style-group"><div class="le-style-group-title" onclick="toggleStyleGroup(this)"><span>Effects & Animation</span><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></div><div class="le-style-group-body">';
+  // Effects
+  html += '<div class="le-style-group collapsed"><div class="le-style-group-title" onclick="toggleStyleGroup(this)"><span>Effects</span><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></div><div class="le-style-group-body">';
   html += '<div class="le-field"><label class="le-field-label">Opacity</label>' +
     '<input type="range" class="le-range-input" data-style-key="opacity" value="' + (st.opacity || '100') + '" min="0" max="100" step="5">' +
     '<span class="le-range-val">' + (st.opacity || '100') + '%</span></div>';
-  html += '<div class="le-field"><label class="le-field-label">Entrance Animation</label>' +
+  html += '<div class="le-field"><label class="le-field-label">Animation</label>' +
     '<select class="le-field-select" data-style-key="animation">' +
-    [{v:'',l:'None'},{v:'fadeIn',l:'Fade In'},{v:'slideUp',l:'Slide Up'},{v:'slideLeft',l:'Slide from Left'},{v:'slideRight',l:'Slide from Right'},{v:'zoomIn',l:'Zoom In'},{v:'bounce',l:'Bounce'}].map(function(o) {
+    [{v:'',l:'None'},{v:'fadeIn',l:'Fade In'},{v:'slideUp',l:'Slide Up'},{v:'slideLeft',l:'Slide Left'},{v:'slideRight',l:'Slide Right'}].map(function(o) {
       return '<option value="' + o.v + '"' + ((st.animation || '') === o.v ? ' selected' : '') + '>' + o.l + '</option>';
-    }).join('') +
-    '</select></div>';
+    }).join('') + '</select></div>';
   html += '<div class="le-field"><label class="le-field-label">Max Width</label>' +
     '<select class="le-field-select" data-style-key="maxWidth">' +
-    [{v:'',l:'Default'},{v:'800px',l:'Narrow (800px)'},{v:'1000px',l:'Medium (1000px)'},{v:'1200px',l:'Wide (1200px)'},{v:'100%',l:'Full Width'}].map(function(o) {
+    [{v:'',l:'Default'},{v:'800px',l:'Narrow'},{v:'1000px',l:'Medium'},{v:'1200px',l:'Wide'},{v:'100%',l:'Full'}].map(function(o) {
       return '<option value="' + o.v + '"' + ((st.maxWidth || '') === o.v ? ' selected' : '') + '>' + o.l + '</option>';
-    }).join('') +
-    '</select></div>';
+    }).join('') + '</select></div>';
   html += '</div></div>';
 
-  // Reset
-  html += '<button class="btn btn--small le-reset-btn" onclick="resetSectionStyle()">Reset All Styles</button>';
+  html += '<button class="le-reset-styles" onclick="resetSectionStyle()">Reset All Styles</button>';
 
   fields.innerHTML = html;
 
   // Attach style handlers
   fields.querySelectorAll('[data-style-key]').forEach(function(input) {
-    if (input.classList.contains('le-btn-group-item')) return; // handled by onclick
+    if (input.classList.contains('le-btn-group-item')) return;
     input.addEventListener('input', function() {
       updateStyleValue(this);
-      // Update range value display
       if (this.type === 'range') {
         var display = this.nextElementSibling;
         if (display) display.textContent = this.value + '%';
       }
     });
-    input.addEventListener('change', function() {
-      updateStyleValue(this);
-    });
+    input.addEventListener('change', function() { updateStyleValue(this); });
   });
 }
 
@@ -897,9 +867,7 @@ function colorField(label, key, val, def) {
 }
 
 function toggleStyleGroup(el) {
-  var body = el.nextElementSibling;
-  var group = el.parentElement;
-  group.classList.toggle('collapsed');
+  el.parentElement.classList.toggle('collapsed');
 }
 
 function setStyleGroupVal(btn) {
@@ -907,12 +875,8 @@ function setStyleGroupVal(btn) {
   var val = btn.dataset.val;
   var vk = getVisKey(sections[selectedIdx], selectedIdx);
   if (!sectionStyles[vk]) sectionStyles[vk] = {};
-  // Toggle if same value
-  if (sectionStyles[vk][key] === val) {
-    delete sectionStyles[vk][key];
-  } else {
-    sectionStyles[vk][key] = val;
-  }
+  if (sectionStyles[vk][key] === val) delete sectionStyles[vk][key];
+  else sectionStyles[vk][key] = val;
   pushHistory();
   renderStylePanel();
   debouncedPreview();
@@ -923,22 +887,15 @@ function updateStyleValue(input) {
   if (selectedIdx < 0) return;
   var vk = getVisKey(sections[selectedIdx], selectedIdx);
   if (!sectionStyles[vk]) sectionStyles[vk] = {};
-
   var val = input.value;
-  if (val === '' || val === undefined) {
-    delete sectionStyles[vk][key];
-  } else {
-    sectionStyles[vk][key] = val;
-  }
-
-  // Sync color picker and text input
+  if (val === '' || val === undefined) delete sectionStyles[vk][key];
+  else sectionStyles[vk][key] = val;
   var container = input.closest('.le-color-row');
   if (container) {
     container.querySelectorAll('[data-style-key="' + key + '"]').forEach(function(el) {
       if (el !== input) el.value = val;
     });
   }
-
   pushHistory();
   debouncedPreview();
 }
@@ -999,41 +956,24 @@ function handleImageUpload(input) {
   fill.style.width = '30%';
   status.textContent = 'Uploading...';
 
-  fetch('/upload', {
-    method: 'POST',
-    body: formData
-  }).then(function(r) {
-    fill.style.width = '80%';
-    return r.json();
-  }).then(function(data) {
-    fill.style.width = '100%';
-    status.textContent = 'Done!';
-    if (data.fullUrl && imageUploadCallback) {
-      imageUploadCallback(data.fullUrl);
-    }
-    setTimeout(function() {
-      closeImageModal();
-      progress.style.display = 'none';
-      fill.style.width = '0%';
-    }, 500);
-  }).catch(function(err) {
-    status.textContent = 'Upload failed';
-    fill.style.width = '0%';
-  });
+  fetch('/upload', { method: 'POST', body: formData })
+    .then(function(r) { fill.style.width = '80%'; return r.json(); })
+    .then(function(data) {
+      fill.style.width = '100%';
+      status.textContent = 'Done!';
+      if (data.fullUrl && imageUploadCallback) imageUploadCallback(data.fullUrl);
+      setTimeout(function() { closeImageModal(); progress.style.display = 'none'; fill.style.width = '0%'; }, 500);
+    }).catch(function() { status.textContent = 'Upload failed'; fill.style.width = '0%'; });
   input.value = '';
 }
 
-// Upload zone drag-and-drop
 var uploadZone = document.getElementById('uploadZone');
 uploadZone.addEventListener('dragover', function(e) { e.preventDefault(); uploadZone.classList.add('drag-active'); });
 uploadZone.addEventListener('dragleave', function() { uploadZone.classList.remove('drag-active'); });
 uploadZone.addEventListener('drop', function(e) {
   e.preventDefault();
   uploadZone.classList.remove('drag-active');
-  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-    var fakeInput = { files: e.dataTransfer.files };
-    handleImageUpload(fakeInput);
-  }
+  if (e.dataTransfer.files && e.dataTransfer.files[0]) handleImageUpload({ files: e.dataTransfer.files });
 });
 
 // ═══════════════════════════════════════════════════════
@@ -1044,25 +984,14 @@ function refreshPreview() {
   fetch('/admin/layout/preview', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      sections: sections,
-      content: sectionContent,
-      styles: sectionStyles,
-      visibility: sectionVisibility
-    })
+    body: JSON.stringify({ sections: sections, content: sectionContent, styles: sectionStyles, visibility: sectionVisibility })
   }).then(function(r) { return r.text(); })
   .then(function(html) {
     var frame = document.getElementById('previewFrame');
-    // Inject interactive editing script into preview
     var editScript = '<style>' +
       '[data-section-idx]{position:relative;transition:outline 0.15s}' +
       '[data-section-idx]:hover{outline:2px dashed #2563eb;outline-offset:-2px;cursor:pointer}' +
       '[data-section-idx].le-selected{outline:2px solid #2563eb;outline-offset:-2px}' +
-      '.le-section-overlay{position:absolute;top:4px;right:4px;display:none;gap:4px;z-index:999}' +
-      '[data-section-idx]:hover .le-section-overlay,[data-section-idx].le-selected .le-section-overlay{display:flex}' +
-      '.le-overlay-btn{background:#2563eb;color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer;font-family:system-ui}' +
-      '.le-overlay-btn:hover{background:#1d4ed8}' +
-      '.le-drop-indicator{height:4px;background:#2563eb;margin:0;transition:all 0.2s;border-radius:2px}' +
       '</style>';
     editScript += '<script>' +
       'document.addEventListener("click",function(e){' +
@@ -1074,28 +1003,6 @@ function refreshPreview() {
           'parent.postMessage({type:"select-section",idx:parseInt(sec.dataset.sectionIdx)},"*");' +
         '}' +
       '});' +
-      'var dragSrc=null;' +
-      'document.querySelectorAll("[data-section-idx]").forEach(function(sec){' +
-        'sec.draggable=true;' +
-        'sec.addEventListener("dragstart",function(e){' +
-          'dragSrc=sec;e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain","");' +
-        '});' +
-        'sec.addEventListener("dragover",function(e){' +
-          'e.preventDefault();e.dataTransfer.dropEffect="move";' +
-          'var rect=sec.getBoundingClientRect();var mid=rect.top+rect.height/2;' +
-          'if(e.clientY<mid){sec.style.borderTop="3px solid #2563eb";sec.style.borderBottom="";}' +
-          'else{sec.style.borderBottom="3px solid #2563eb";sec.style.borderTop="";}' +
-        '});' +
-        'sec.addEventListener("dragleave",function(){sec.style.borderTop="";sec.style.borderBottom="";});' +
-        'sec.addEventListener("drop",function(e){' +
-          'e.preventDefault();sec.style.borderTop="";sec.style.borderBottom="";' +
-          'if(!dragSrc||dragSrc===sec)return;' +
-          'var from=parseInt(dragSrc.dataset.sectionIdx);var to=parseInt(sec.dataset.sectionIdx);' +
-          'var rect=sec.getBoundingClientRect();var mid=rect.top+rect.height/2;' +
-          'if(e.clientY>=mid)to++;' +
-          'parent.postMessage({type:"reorder-section",from:from,to:to},"*");' +
-        '});' +
-      '});' +
       'window.addEventListener("message",function(e){' +
         'if(e.data&&e.data.type==="highlight-section"){' +
           'document.querySelectorAll("[data-section-idx]").forEach(function(s){s.classList.remove("le-selected")});' +
@@ -1106,22 +1013,15 @@ function refreshPreview() {
       '<\/script>';
     html = html.replace('</body>', editScript + '</body>');
     frame.srcdoc = html;
-    frame.onload = function() {
-      document.getElementById('previewLoading').style.display = 'none';
-    };
-  }).catch(function() {
-    document.getElementById('previewLoading').style.display = 'none';
-  });
+    frame.onload = function() { document.getElementById('previewLoading').style.display = 'none'; };
+  }).catch(function() { document.getElementById('previewLoading').style.display = 'none'; });
 }
 
-// Listen for messages from preview iframe
 window.addEventListener('message', function(e) {
   if (!e.data || !e.data.type) return;
-  if (e.data.type === 'select-section') {
-    selectSection(e.data.idx);
-  } else if (e.data.type === 'reorder-section') {
-    var from = e.data.from;
-    var to = e.data.to;
+  if (e.data.type === 'select-section') selectSection(e.data.idx);
+  else if (e.data.type === 'reorder-section') {
+    var from = e.data.from, to = e.data.to;
     if (from === to || from < 0 || from >= sections.length) return;
     pushHistory();
     if (to > from) to--;
@@ -1136,9 +1036,7 @@ window.addEventListener('message', function(e) {
 
 function highlightPreviewSection(idx) {
   var frame = document.getElementById('previewFrame');
-  if (frame.contentWindow) {
-    frame.contentWindow.postMessage({ type: 'highlight-section', idx: idx }, '*');
-  }
+  if (frame.contentWindow) frame.contentWindow.postMessage({ type: 'highlight-section', idx: idx }, '*');
 }
 
 function debouncedPreview() {
@@ -1146,24 +1044,17 @@ function debouncedPreview() {
   previewDebounce = setTimeout(refreshPreview, 600);
 }
 
-// ═══════════════════════════════════════════════════════
-// CANVAS DROP (drag from component library to preview)
-// ═══════════════════════════════════════════════════════
+// Canvas drop
 var previewArea = document.getElementById('lePreviewArea');
 var canvasOverlay = document.getElementById('canvasDropOverlay');
-
 previewArea.addEventListener('dragover', function(e) {
-  var blockType = e.dataTransfer.types.indexOf('block-type') >= 0 ||
-                  (e.dataTransfer.getData && e.dataTransfer.types.indexOf('text/plain') >= 0);
-  if (blockType) {
+  if (e.dataTransfer.types.indexOf('block-type') >= 0 || e.dataTransfer.types.indexOf('text/plain') >= 0) {
     e.preventDefault();
     canvasOverlay.style.display = 'flex';
   }
 });
 previewArea.addEventListener('dragleave', function(e) {
-  if (!previewArea.contains(e.relatedTarget)) {
-    canvasOverlay.style.display = 'none';
-  }
+  if (!previewArea.contains(e.relatedTarget)) canvasOverlay.style.display = 'none';
 });
 previewArea.addEventListener('drop', function(e) {
   e.preventDefault();
@@ -1180,26 +1071,20 @@ previewArea.addEventListener('drop', function(e) {
   }
 });
 
-// ═══════════════════════════════════════════════════════
-// RESPONSIVE PREVIEW
-// ═══════════════════════════════════════════════════════
+// Responsive preview
 document.querySelectorAll('.le-device-btn').forEach(function(btn) {
   btn.addEventListener('click', function() {
     document.querySelectorAll('.le-device-btn').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
-    var device = btn.dataset.device;
-    var wrapper = document.getElementById('previewFrameWrapper');
-    wrapper.className = 'le-preview-frame-wrapper le-device-' + device;
+    document.getElementById('previewFrameWrapper').className = 'le-preview-frame-wrapper le-device-' + btn.dataset.device;
   });
 });
 
-// ═══════════════════════════════════════════════════════
-// PANEL TABS
-// ═══════════════════════════════════════════════════════
+// Panel tabs
 document.querySelectorAll('.le-panel-tabs').forEach(function(tabs) {
   tabs.querySelectorAll('.le-tab').forEach(function(tab) {
     tab.addEventListener('click', function() {
-      var parent = tab.closest('.le-left-panel, .le-right-panel');
+      var parent = tab.closest('.le-right-panel');
       parent.querySelectorAll('.le-tab').forEach(function(t) { t.classList.remove('active'); });
       parent.querySelectorAll('.le-tab-content').forEach(function(c) { c.classList.remove('active'); });
       tab.classList.add('active');
@@ -1210,26 +1095,14 @@ document.querySelectorAll('.le-panel-tabs').forEach(function(tabs) {
 });
 
 // ═══════════════════════════════════════════════════════
-// COMPONENT LIBRARY DRAG
-// ═══════════════════════════════════════════════════════
-document.querySelectorAll('.le-comp-item').forEach(function(item) {
-  item.addEventListener('dragstart', function(e) {
-    e.dataTransfer.setData('block-type', item.dataset.block);
-    e.dataTransfer.effectAllowed = 'copy';
-  });
-});
-
-// ═══════════════════════════════════════════════════════
 // KEYBOARD SHORTCUTS
 // ═══════════════════════════════════════════════════════
 document.addEventListener('keydown', function(e) {
-  // Don't handle shortcuts when typing in inputs
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
     if (e.key === 'Escape') e.target.blur();
     return;
   }
   var ctrl = e.ctrlKey || e.metaKey;
-
   if (ctrl && e.key === 'z') { e.preventDefault(); undo(); }
   else if (ctrl && e.key === 'y') { e.preventDefault(); redo(); }
   else if (ctrl && e.key === 's') { e.preventDefault(); saveDraft(); }
@@ -1238,7 +1111,7 @@ document.addEventListener('keydown', function(e) {
   else if (e.key === 'Delete' && selectedIdx >= 0) { removeSection(selectedIdx, {stopPropagation:function(){}}); }
   else if (ctrl && e.key === 'ArrowUp') { e.preventDefault(); moveSectionUp(); }
   else if (ctrl && e.key === 'ArrowDown') { e.preventDefault(); moveSectionDown(); }
-  else if (e.key === 'Escape') { selectedIdx = -1; renderSectionList(); renderContentPanel(); renderStylePanel(); }
+  else if (e.key === 'Escape') { selectedIdx = -1; closePicker(); renderSectionList(); renderContentPanel(); renderStylePanel(); }
   else if (e.key === '?') { document.getElementById('shortcutsModal').style.display = 'flex'; }
 });
 
@@ -1264,7 +1137,7 @@ function publishLayout() {
     body: JSON.stringify({ sections: sections, content: sectionContent, styles: sectionStyles, visibility: sectionVisibility })
   }).then(function(r) { return r.json(); })
   .then(function(data) {
-    if (data.ok) showToast('Layout published to live site!', 'success');
+    if (data.ok) showToast('Layout published!', 'success');
     else showToast('Error publishing layout', 'error');
   }).catch(function() { showToast('Error publishing layout', 'error'); });
 }
@@ -1276,21 +1149,16 @@ function discardDraft() {
     headers: { 'Content-Type': 'application/json' }
   }).then(function(r) { return r.json(); })
   .then(function(data) {
-    if (data.ok) {
-      showToast('Draft discarded', 'info');
-      window.location.reload();
-    }
+    if (data.ok) { showToast('Draft discarded', 'info'); window.location.reload(); }
   }).catch(function() { showToast('Error discarding draft', 'error'); });
 }
 
-// Auto-save every 60 seconds
-setInterval(function() {
-  if (sections.length > 0) saveDraft();
-}, 60000);
+setInterval(function() { if (sections.length > 0) saveDraft(); }, 60000);
 
 // ═══════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════
+buildPickerList();
 renderSectionList();
 refreshPreview();
 </script>
