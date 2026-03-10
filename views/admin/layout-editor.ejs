@@ -2,15 +2,19 @@
 <%- include('partials/nav') %>
 
 <div class="admin-main le-fullscreen">
-  <!-- Top Toolbar -->
+  <!-- Top Toolbar — matches admin header style -->
   <div class="le-toolbar">
     <div class="le-toolbar-left">
       <a href="/admin" class="le-back-btn" title="Back to Dashboard">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
       </a>
-      <h1 class="le-toolbar-title">Layout Editor</h1>
+      <div class="le-toolbar-breadcrumb">
+        <a href="/admin" class="le-breadcrumb-link">Dashboard</a>
+        <span class="le-breadcrumb-sep">/</span>
+        <span class="le-breadcrumb-current">Layout Editor</span>
+      </div>
       <% if (hasDraft) { %>
-        <span class="le-draft-badge">Draft</span>
+        <span class="badge badge--warning">Draft</span>
       <% } %>
     </div>
     <div class="le-toolbar-center">
@@ -34,9 +38,12 @@
       </div>
     </div>
     <div class="le-toolbar-right">
-      <button class="le-text-btn" onclick="discardDraft()">Discard</button>
-      <button class="le-text-btn" onclick="saveDraft()">Save Draft</button>
-      <button class="le-publish-btn" onclick="publishLayout()">
+      <button class="btn btn--ghost btn--small" onclick="discardDraft()">Discard</button>
+      <button class="btn btn--small" onclick="saveDraft()">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+        Save Draft
+      </button>
+      <button class="btn btn--primary btn--small" onclick="publishLayout()">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
         Publish
       </button>
@@ -56,6 +63,12 @@
 
       <!-- Component Picker Dropdown -->
       <div class="le-picker" id="componentPicker" style="display:none;">
+        <div class="le-picker-header">
+          <span class="le-panel-title">Add Section</span>
+          <button class="le-picker-close" onclick="closePicker()" title="Close">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
         <div class="le-picker-search">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
           <input type="text" id="compSearch" placeholder="Search components..." oninput="filterComponents(this.value)">
@@ -90,16 +103,22 @@
 
       <div class="le-tab-content active" id="tab-content-edit">
         <div class="le-no-selection" id="contentNoSelection">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
-          <p>Click a section to edit</p>
+          <div class="le-no-sel-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
+          </div>
+          <p class="le-no-sel-title">No section selected</p>
+          <p class="le-no-sel-desc">Click a section in the left panel or on the preview to edit its content.</p>
         </div>
         <div id="contentEditFields" style="display:none;"></div>
       </div>
 
       <div class="le-tab-content" id="tab-style-edit">
         <div class="le-no-selection" id="styleNoSelection">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
-          <p>Click a section to style</p>
+          <div class="le-no-sel-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+          </div>
+          <p class="le-no-sel-title">No section selected</p>
+          <p class="le-no-sel-desc">Click a section to adjust colors, spacing, typography, and more.</p>
         </div>
         <div id="styleEditFields" style="display:none;"></div>
       </div>
