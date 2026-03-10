@@ -1705,10 +1705,9 @@ textarea.le-field-input {
 .le-section-item:hover { border-color: var(--admin-border); box-shadow: var(--shadow-sm); }
 .le-section-item.selected { border-color: var(--admin-accent); background: var(--admin-accent-light); box-shadow: 0 0 0 1px var(--admin-accent); }
 .le-section-item.hidden-section { opacity: 0.4; }
-.le-section-item.dragging { opacity: 0.3; }
-.le-section-item.drag-over { border-color: var(--admin-accent); border-style: dashed; }
+/* dragging/drag-over styles at bottom of file */
 
-.le-section-drag { color: var(--admin-muted); cursor: grab; flex-shrink: 0; opacity: 0; transition: opacity var(--transition); }
+.le-section-drag { color: var(--admin-muted); cursor: grab; flex-shrink: 0; opacity: 0; transition: opacity var(--transition), transform 0.15s ease; }
 .le-section-item:hover .le-section-drag { opacity: 1; }
 .le-section-drag svg { width: 12px; height: 12px; }
 
@@ -2159,3 +2158,70 @@ textarea.le-field-input {
   color: var(--admin-text-secondary);
 }
 .le-shortcut-item span { font-size: 0.8rem; color: var(--admin-text); }
+
+/* ─── Theme Toggle in Layout Editor ────────────────── */
+.le-theme-toggle { position: relative; }
+.le-theme-icon-dark { display: none; }
+[data-theme="dark"] .le-theme-icon-light { display: none; }
+[data-theme="dark"] .le-theme-icon-dark { display: block; }
+
+/* ─── Enhanced Drag & Drop Feedback ────────────────── */
+.le-section-item.dragging {
+  opacity: 0.4;
+  transform: scale(0.97);
+  box-shadow: none;
+  border-style: dashed;
+  border-color: var(--admin-border);
+}
+.le-section-item.drag-over {
+  border-color: var(--admin-accent);
+  border-style: dashed;
+  background: var(--admin-accent-light);
+  box-shadow: inset 0 0 0 1px var(--admin-accent);
+  transform: scale(1.01);
+}
+.le-picker-item[draggable="true"] {
+  cursor: grab;
+}
+.le-picker-item[draggable="true"]:active {
+  cursor: grabbing;
+}
+.le-canvas-drop-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(37, 99, 235, 0.08);
+  border: 3px dashed var(--admin-accent);
+  border-radius: var(--radius-md);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: le-pulse-border 1.5s ease-in-out infinite;
+}
+@keyframes le-pulse-border {
+  0%, 100% { border-color: var(--admin-accent); }
+  50% { border-color: transparent; }
+}
+.le-canvas-drop-msg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--admin-accent);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.le-canvas-drop-msg svg {
+  width: 40px;
+  height: 40px;
+  opacity: 0.6;
+}
+[data-theme="dark"] .le-canvas-drop-overlay {
+  background: rgba(37, 99, 235, 0.12);
+}
+.le-section-drag {
+  cursor: grab;
+}
+.le-section-drag:active {
+  cursor: grabbing;
+}
