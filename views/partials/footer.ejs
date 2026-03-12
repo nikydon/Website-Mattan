@@ -1,12 +1,24 @@
 <footer class="site-footer">
   <div class="footer-inner">
-    <span class="brand-name">MATTAN</span>
-    <p class="footer-tagline"><%= typeof settings !== 'undefined' && settings.tagline ? settings.tagline : '' %></p>
-    <p class="footer-contact">
+    <div class="footer-brand">
+      <span class="brand-name">MATTAN</span>
+      <p class="footer-tagline"><%= typeof settings !== 'undefined' && settings.tagline ? settings.tagline : '' %></p>
+    </div>
+    <div class="footer-nav">
+      <ul class="footer-nav-links">
+        <li><a href="/collections">Collections</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/news">Journal</a></li>
+      </ul>
+    </div>
+    <div class="footer-contact">
       <% if (typeof settings !== 'undefined' && settings.contact_email) { %>
         <a href="mailto:<%= settings.contact_email %>"><%= settings.contact_email %></a>
       <% } %>
-    </p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    &copy; <%= new Date().getFullYear() %> MATTAN. All rights reserved.
   </div>
 </footer>
 </body>
