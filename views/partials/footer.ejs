@@ -2,14 +2,14 @@
   <div class="footer-inner">
     <div class="footer-brand">
       <span class="brand-name">MATTAN</span>
-      <p class="footer-tagline"><%= typeof settings !== 'undefined' && settings.tagline ? settings.tagline : '' %></p>
     </div>
-    <div class="footer-nav">
+    <div class="footer-center">
       <ul class="footer-nav-links">
         <li><a href="/collections">Collections</a></li>
         <li><a href="/about">About</a></li>
-        <li><a href="/news">Journal</a></li>
+        <li><a href="/news">News</a></li>
       </ul>
+      <p class="footer-tagline"><%= typeof settings !== 'undefined' && settings.tagline ? settings.tagline : '' %></p>
     </div>
     <div class="footer-contact">
       <% if (typeof settings !== 'undefined' && settings.contact_email) { %>
