@@ -6,16 +6,10 @@
   var linkUrl = c.linkUrl || '';
   var linkText = c.linkText || 'Learn More';
 %>
-<section class="banner-section" <% if (imageUrl) { %>style="background-image: url('<%= imageUrl %>')"<% } %>>
+<section class="banner-section" <% if (imageUrl) { %>style="background-image: url('<%= imageUrl %>')"<% } %> data-editable-image="imageUrl">
   <div class="banner-overlay">
-    <% if (heading) { %>
-      <h2 class="banner-heading"><%= heading %></h2>
-    <% } %>
-    <% if (subtitle) { %>
-      <p class="banner-subtitle"><%= subtitle %></p>
-    <% } %>
-    <% if (linkUrl) { %>
-      <a href="<%= linkUrl %>" class="banner-link"><%= linkText %></a>
-    <% } %>
+    <h2 class="banner-heading" data-editable="heading"><%= heading %></h2>
+    <p class="banner-subtitle" data-editable="subtitle"><%= subtitle %></p>
+    <a href="<%= linkUrl %>" class="banner-link" data-editable="linkText"><%= linkText %></a>
   </div>
 </section>

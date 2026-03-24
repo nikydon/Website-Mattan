@@ -4,7 +4,7 @@
 %>
 <% if (typeof recentPosts !== 'undefined' && recentPosts.length) { %>
 <section class="section news-feed-section">
-  <h2 class="section-title"><%= heading %></h2>
+  <h2 class="section-title" data-editable="heading"><%= heading %></h2>
   <div class="grid grid-3">
     <% recentPosts.forEach(function(post) { %>
     <a href="/news/<%= post.slug %>" class="news-feed-card">

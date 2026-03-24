@@ -4,7 +4,7 @@
 %>
 <% if (typeof featuredProducts !== 'undefined' && featuredProducts.length) { %>
 <section class="section featured-products">
-  <h2 class="section-title"><%= heading %></h2>
+  <h2 class="section-title" data-editable="heading"><%= heading %></h2>
   <div class="grid grid-4">
     <% featuredProducts.forEach(function(item) { %>
     <a href="/pieces/<%= item.slug %>" class="card">

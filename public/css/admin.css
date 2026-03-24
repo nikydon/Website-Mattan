@@ -2225,3 +2225,141 @@ textarea.le-field-input {
 .le-section-drag:active {
   cursor: grabbing;
 }
+
+/* ─── Style Inspiration Panel ─────────────────────────── */
+.le-inspo-desc {
+  font-size: 0.8rem;
+  color: var(--admin-muted);
+  margin: 0 0 0.75rem;
+  line-height: 1.4;
+}
+.le-inspo-add {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.le-inspo-add .le-field-input {
+  flex: 1;
+  font-size: 0.8rem;
+}
+.le-inspo-sites {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.le-inspo-site {
+  background: var(--admin-card-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+}
+.le-inspo-site-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.le-inspo-site-info {
+  flex: 1;
+  min-width: 0;
+}
+.le-inspo-site-name {
+  display: block;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.le-inspo-site-url {
+  display: block;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.le-inspo-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: var(--admin-muted);
+  padding: 0 4px;
+  line-height: 1;
+}
+.le-inspo-delete:hover { color: var(--admin-danger); }
+.le-inspo-swatches {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 0.4rem;
+  flex-wrap: wrap;
+}
+.le-inspo-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid var(--admin-border);
+}
+.le-inspo-fonts {
+  font-size: 0.7rem;
+  margin-bottom: 0.5rem;
+}
+.le-inspo-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.le-inspo-slider-label {
+  font-size: 0.75rem;
+  color: var(--admin-muted);
+  white-space: nowrap;
+}
+.le-inspo-slider {
+  flex: 1;
+  accent-color: var(--admin-accent);
+  cursor: pointer;
+}
+.le-inspo-slider-val {
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 32px;
+  text-align: right;
+}
+.le-inspo-blend-preview {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: var(--admin-card-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-md);
+}
+.le-inspo-blend-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+.le-inspo-color-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 0.5rem;
+}
+.le-inspo-swatch-labeled {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.le-inspo-swatch-name {
+  font-size: 0.6rem;
+  color: var(--admin-muted);
+}
+.le-inspo-typo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.72rem;
+  color: var(--admin-muted);
+}
+.le-inspo-empty {
+  text-align: center;
+  padding: 1.5rem 0;
+}

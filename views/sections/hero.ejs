@@ -6,7 +6,7 @@
   var ctaLink = c.ctaLink || '/collections';
 %>
 <section class="hero">
-  <h1 class="hero-title"><%= heading %></h1>
-  <p class="hero-tagline"><%= tagline %></p>
-  <a href="<%= ctaLink %>" class="hero-cta"><%= ctaText %></a>
+  <h1 class="hero-title" data-editable="heading"><%= heading %></h1>
+  <p class="hero-tagline" data-editable="tagline"><%= tagline %></p>
+  <a href="<%= ctaLink %>" class="hero-cta" data-editable="ctaText"><%= ctaText %></a>
 </section>

@@ -5,7 +5,7 @@
   var tiktokHandle = c.tiktokHandle || (typeof settings !== 'undefined' && settings.social_tiktok ? settings.social_tiktok : '');
 %>
 <section class="section social-feed-section">
-  <h2 class="section-title"><%= heading %></h2>
+  <h2 class="section-title" data-editable="heading"><%= heading %></h2>
   <div class="social-links-row">
     <% if (instagramHandle) { %>
     <a href="https://instagram.com/<%= instagramHandle.replace('@','') %>" target="_blank" class="social-link-card">

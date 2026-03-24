@@ -46,6 +46,42 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   res.redirect('/admin/media?msg=File uploaded.');
 });
 
+// Upload media (JSON API for layout editor and other AJAX callers)
+router.post('/upload-json', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No valid file provided.' });
+    }
+
+    const tenant = await getDefaultTenant();
+    const mediaType = detectMediaType(req.file.mimetype);
+    const thumbName = await generateThumbnail(req.file.filename, req.file.mimetype);
+
+    const image = await prisma.image.create({
+      data: {
+        tenantId: tenant.id,
+        filename: req.file.filename,
+        originalName: req.file.originalname,
+        altText: req.body.altText || null,
+        mediaType,
+        category: req.body.category || 'general',
+      },
+    });
+
+    return res.status(201).json({
+      id: image.id,
+      filename: image.filename,
+      thumbnail: thumbName,
+      originalName: image.originalName,
+      fullUrl: '/uploads/full/' + image.filename,
+      thumbUrl: thumbName ? '/uploads/thumbs/' + thumbName : null,
+    });
+  } catch (err) {
+    console.error('Upload JSON error:', err);
+    return res.status(500).json({ error: 'Upload failed.' });
+  }
+});
+
 // Delete media
 router.post('/:id/delete', async (req, res) => {
   const image = await prisma.image.findUnique({ where: { id: req.params.id } });

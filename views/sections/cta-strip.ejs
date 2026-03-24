@@ -8,9 +8,9 @@
 <section class="cta-strip-section">
   <div class="cta-strip-inner">
     <div class="cta-strip-text">
-      <h2 class="cta-strip-heading"><%= heading %></h2>
-      <% if (subtitle) { %><p class="cta-strip-subtitle"><%= subtitle %></p><% } %>
+      <h2 class="cta-strip-heading" data-editable="heading"><%= heading %></h2>
+      <p class="cta-strip-subtitle" data-editable="subtitle"><%= subtitle %></p>
     </div>
-    <a href="<%= ctaLink %>" class="hero-cta"><%= ctaText %></a>
+    <a href="<%= ctaLink %>" class="hero-cta" data-editable="ctaText"><%= ctaText %></a>
   </div>
 </section>

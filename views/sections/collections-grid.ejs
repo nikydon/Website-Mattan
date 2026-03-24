@@ -4,7 +4,7 @@
 %>
 <% if (typeof collections !== 'undefined' && collections.length) { %>
 <section class="section collections-preview">
-  <h2 class="section-title"><%= heading %></h2>
+  <h2 class="section-title" data-editable="heading"><%= heading %></h2>
   <div class="grid grid-4">
     <% collections.forEach(function(col) { %>
     <a href="/collections/<%= col.slug %>" class="card">
