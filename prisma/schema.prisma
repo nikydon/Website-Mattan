@@ -14,14 +14,15 @@ model Tenant {
   slug      String   @unique
   createdAt DateTime @default(now()) @map("created_at")
 
-  collections  Collection[]
-  catalogItems CatalogItem[]
-  images       Image[]
-  newsPosts    NewsPost[]
-  siteSettings SiteSetting[]
-  customers    Customer[]
-  orders       Order[]
-  coupons      Coupon[]
+  collections    Collection[]
+  catalogItems   CatalogItem[]
+  images         Image[]
+  newsPosts      NewsPost[]
+  siteSettings   SiteSetting[]
+  customers      Customer[]
+  orders         Order[]
+  coupons        Coupon[]
+  referenceSites ReferenceSite[]
 
   @@map("tenants")
 }
@@ -192,4 +193,21 @@ model Coupon {
 
   @@unique([tenantId, code])
   @@map("coupons")
+}
+
+// ─── ReferenceSite ──────────────────────────────────────
+model ReferenceSite {
+  id           String   @id @default(uuid())
+  tenantId     String   @map("tenant_id")
+  url          String
+  name         String?
+  influence    Int      @default(0)
+  designTokens String?  @map("design_tokens") @db.Text
+  status       String   @default("pending")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("reference_sites")
 }

@@ -85,5 +85,6 @@ router.use('/customers', require('./customers'));
 router.use('/coupons', require('./coupons'));
 router.use('/analytics', require('./analytics'));
 router.use('/layout', require('./layout'));
+router.use('/references', require('./references'));
 
 module.exports = router;

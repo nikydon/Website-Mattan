@@ -4,10 +4,6 @@
   var body = c.body || '';
 %>
 <section class="section text-block-section">
-  <% if (heading) { %>
-    <h2 class="section-title"><%= heading %></h2>
-  <% } %>
-  <% if (body) { %>
-    <div class="text-block-body"><%- body.replace(/\n/g, '<br>') %></div>
-  <% } %>
+  <h2 class="section-title" data-editable="heading"><%= heading %></h2>
+  <div class="text-block-body" data-editable="body"><%- body ? body.replace(/\n/g, '<br>') : '' %></div>
 </section>

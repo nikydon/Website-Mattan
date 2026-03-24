@@ -104,6 +104,7 @@
       <div class="le-panel-tabs">
         <button class="le-tab active" data-tab="content-edit">Content</button>
         <button class="le-tab" data-tab="style-edit">Style</button>
+        <button class="le-tab" data-tab="inspiration">Inspiration</button>
       </div>
 
       <div class="le-tab-content active" id="tab-content-edit">
@@ -126,6 +127,32 @@
           <p class="le-no-sel-desc">Click a section to adjust colors, spacing, typography, and more.</p>
         </div>
         <div id="styleEditFields" style="display:none;"></div>
+      </div>
+
+      <div class="le-tab-content" id="tab-inspiration">
+        <div class="le-inspo-header">
+          <p class="le-inspo-desc">Add websites you like. Claude will analyze their design and blend styles into your site.</p>
+        </div>
+
+        <div class="le-inspo-add">
+          <input type="url" id="refUrlInput" class="le-field-input" placeholder="https://example.com" onkeydown="if(event.key==='Enter')addReferenceSite()">
+          <button class="btn btn--primary btn--small" onclick="addReferenceSite()" style="white-space:nowrap">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 4v16m8-8H4"/></svg>
+            Add
+          </button>
+        </div>
+
+        <div id="refSitesList" class="le-inspo-sites"></div>
+
+        <div id="refBlendPreview" class="le-inspo-blend-preview" style="display:none">
+          <h4 class="le-inspo-blend-title">Blended Design Tokens</h4>
+          <div id="refBlendColors" class="le-inspo-color-row"></div>
+          <div id="refBlendTypo" class="le-inspo-typo"></div>
+        </div>
+
+        <button class="btn btn--primary btn--small" id="applyBlendBtn" onclick="applyBlendedStyles()" style="display:none;width:100%;margin-top:0.75rem">
+          Apply Blended Styles to All Sections
+        </button>
       </div>
     </div>
   </div>
@@ -970,7 +997,6 @@ function handleImageUpload(input) {
   var file = input.files[0];
   var formData = new FormData();
   formData.append('file', file);
-  formData.append('tenantId', '<%= typeof tenantId !== "undefined" ? tenantId : "default" %>');
   formData.append('category', 'general');
 
   var progress = document.getElementById('uploadProgress');
@@ -980,7 +1006,7 @@ function handleImageUpload(input) {
   fill.style.width = '30%';
   status.textContent = 'Uploading...';
 
-  fetch('/upload', { method: 'POST', body: formData })
+  fetch('/admin/media/upload-json', { method: 'POST', body: formData })
     .then(function(r) { fill.style.width = '80%'; return r.json(); })
     .then(function(data) {
       fill.style.width = '100%';
@@ -1016,9 +1042,16 @@ function refreshPreview() {
       '[data-section-idx]{position:relative;transition:outline 0.15s}' +
       '[data-section-idx]:hover{outline:2px dashed #2563eb;outline-offset:-2px;cursor:pointer}' +
       '[data-section-idx].le-selected{outline:2px solid #2563eb;outline-offset:-2px}' +
+      '[data-editable]:hover{outline:1px dashed #f59e0b;outline-offset:1px;cursor:text}' +
+      '[data-editable][contenteditable="true"]{outline:2px solid #f59e0b;outline-offset:1px;min-height:1em;background:rgba(245,158,11,0.05)}' +
+      '[data-editable-image]:hover,[data-editable-image] img:hover{outline:2px dashed #10b981;outline-offset:2px;cursor:pointer}' +
+      '.le-img-replace-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);color:#fff;padding:6px 14px;border-radius:6px;font-size:13px;pointer-events:none;opacity:0;transition:opacity 0.2s;z-index:10}' +
+      '[data-editable-image]:hover .le-img-replace-badge{opacity:1}' +
       '</style>';
     editScript += '<script>' +
+      /* Click to select section */
       'document.addEventListener("click",function(e){' +
+        'if(e.target.closest("[contenteditable=true]"))return;' +
         'var sec=e.target.closest("[data-section-idx]");' +
         'if(sec){' +
           'e.preventDefault();e.stopPropagation();' +
@@ -1027,11 +1060,87 @@ function refreshPreview() {
           'parent.postMessage({type:"select-section",idx:parseInt(sec.dataset.sectionIdx)},"*");' +
         '}' +
       '});' +
+      /* Double-click to inline edit text */
+      'document.addEventListener("dblclick",function(e){' +
+        'var el=e.target.closest("[data-editable]");' +
+        'if(!el)return;' +
+        'e.preventDefault();e.stopPropagation();' +
+        'el.contentEditable="true";' +
+        'el.focus();' +
+        'var sec=el.closest("[data-section-idx]");' +
+        'if(sec){' +
+          'document.querySelectorAll("[data-section-idx]").forEach(function(s){s.classList.remove("le-selected")});' +
+          'sec.classList.add("le-selected");' +
+          'parent.postMessage({type:"select-section",idx:parseInt(sec.dataset.sectionIdx)},"*");' +
+        '}' +
+      '});' +
+      /* Blur to finish editing and send update */
+      'document.addEventListener("focusout",function(e){' +
+        'var el=e.target.closest("[data-editable][contenteditable=true]");' +
+        'if(!el)return;' +
+        'el.contentEditable="false";' +
+        'var sec=el.closest("[data-section-idx]");' +
+        'if(sec){' +
+          'var text=el.innerText.trim();' +
+          'parent.postMessage({type:"inline-edit",idx:parseInt(sec.dataset.sectionIdx),key:el.dataset.editable,value:text},"*");' +
+        '}' +
+      '});' +
+      /* Enter key finishes editing (except for body/textarea fields) */
+      'document.addEventListener("keydown",function(e){' +
+        'var el=e.target.closest("[data-editable][contenteditable=true]");' +
+        'if(!el)return;' +
+        'if(e.key==="Enter"&&el.dataset.editable!=="body"){e.preventDefault();el.blur();}' +
+        'if(e.key==="Escape"){el.blur();}' +
+      '});' +
+      /* Click on editable image to trigger replace */
+      'document.addEventListener("click",function(e){' +
+        'var imgEl=e.target.closest("[data-editable-image]");' +
+        'if(!imgEl)return;' +
+        'var sec=imgEl.closest("[data-section-idx]");' +
+        'if(sec){' +
+          'e.preventDefault();e.stopPropagation();' +
+          'parent.postMessage({type:"inline-image-click",idx:parseInt(sec.dataset.sectionIdx),key:imgEl.dataset.editableImage},"*");' +
+        '}' +
+      '});' +
+      /* Add replace badges to editable images */
+      'document.querySelectorAll("[data-editable-image]").forEach(function(el){' +
+        'el.style.position="relative";' +
+        'var badge=document.createElement("div");' +
+        'badge.className="le-img-replace-badge";' +
+        'badge.textContent="Click to replace image";' +
+        'el.appendChild(badge);' +
+      '});' +
+      /* Drag-and-drop: show positional indicators via parent messages */
+      'var dropLine=document.createElement("div");' +
+      'dropLine.style.cssText="position:absolute;left:5%;right:5%;height:4px;background:#2563eb;border-radius:2px;pointer-events:none;z-index:9999;display:none;box-shadow:0 0 8px rgba(37,99,235,0.5)";' +
+      'document.body.appendChild(dropLine);' +
+      /* Handle messages from parent */
       'window.addEventListener("message",function(e){' +
-        'if(e.data&&e.data.type==="highlight-section"){' +
+        'if(!e.data||!e.data.type)return;' +
+        'if(e.data.type==="highlight-section"){' +
           'document.querySelectorAll("[data-section-idx]").forEach(function(s){s.classList.remove("le-selected")});' +
           'var t=document.querySelector("[data-section-idx=\\""+e.data.idx+"\\"]");' +
           'if(t){t.classList.add("le-selected");t.scrollIntoView({behavior:"smooth",block:"center"});}' +
+        '}' +
+        'else if(e.data.type==="drag-position"){' +
+          'var y=e.data.y;' +
+          'var secs=document.querySelectorAll("[data-section-idx]");' +
+          'if(!secs.length){dropLine.style.display="block";dropLine.style.top="0px";parent.postMessage({type:"drop-position",position:0},"*");return;}' +
+          'var best=0,bestDist=Infinity;var bestTop=0;' +
+          'for(var i=0;i<secs.length;i++){' +
+            'var r=secs[i].getBoundingClientRect();' +
+            'var top=r.top;' +
+            'var dist=Math.abs(y-top);' +
+            'if(dist<bestDist){bestDist=dist;best=i;bestTop=top;}' +
+            'var distBot=Math.abs(y-(top+r.height));' +
+            'if(distBot<bestDist){bestDist=distBot;best=i+1;bestTop=top+r.height;}' +
+          '}' +
+          'dropLine.style.display="block";' +
+          'dropLine.style.top=(bestTop-2)+"px";' +
+          'parent.postMessage({type:"drop-position",position:best},"*");' +
+        '}' +
+        'else if(e.data.type==="drag-leave"){' +
+          'dropLine.style.display="none";' +
         '}' +
       '});' +
       '<\/script>';
@@ -1044,6 +1153,47 @@ function refreshPreview() {
 window.addEventListener('message', function(e) {
   if (!e.data || !e.data.type) return;
   if (e.data.type === 'select-section') selectSection(e.data.idx);
+  else if (e.data.type === 'inline-edit') {
+    // Inline text edit from canvas
+    var idx = e.data.idx;
+    var key = e.data.key;
+    var value = e.data.value;
+    if (idx < 0 || idx >= sections.length) return;
+    var s = sections[idx];
+    pushHistory();
+    if (!sectionContent[s]) sectionContent[s] = {};
+    sectionContent[s][key] = value;
+    // Update sidebar if this section is selected
+    if (selectedIdx === idx) renderContentPanel();
+    // Don't refresh preview since we just edited inline
+  }
+  else if (e.data.type === 'inline-image-click') {
+    // Image click from canvas — open upload modal
+    var idx = e.data.idx;
+    var key = e.data.key;
+    if (idx < 0 || idx >= sections.length) return;
+    selectSection(idx);
+    var s = sections[idx];
+    openImageUpload(s, key);
+  }
+  else if (e.data.type === 'drop-position') {
+    canvasDropPosition = e.data.position;
+  }
+  else if (e.data.type === 'canvas-drop') {
+    // Drop from picker onto canvas with position
+    var blockType = e.data.blockType;
+    var pos = e.data.position;
+    if (blockType && blockLabels[blockType]) {
+      pushHistory();
+      if (pos < 0 || pos > sections.length) pos = sections.length;
+      sections.splice(pos, 0, blockType);
+      selectedIdx = pos;
+      renderSectionList();
+      renderContentPanel();
+      renderStylePanel();
+      refreshPreview();
+    }
+  }
   else if (e.data.type === 'reorder-section') {
     var from = e.data.from, to = e.data.to;
     if (from === to || from < 0 || from >= sections.length) return;
@@ -1068,26 +1218,45 @@ function debouncedPreview() {
   previewDebounce = setTimeout(refreshPreview, 600);
 }
 
-// Canvas drop
+// Canvas drop — relay drag position to iframe for drop indicators
 var previewArea = document.getElementById('lePreviewArea');
 var canvasOverlay = document.getElementById('canvasDropOverlay');
+var canvasDropPosition = -1;
+
 previewArea.addEventListener('dragover', function(e) {
   if (e.dataTransfer.types.indexOf('block-type') >= 0 || e.dataTransfer.types.indexOf('text/plain') >= 0) {
     e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
     canvasOverlay.style.display = 'flex';
+    // Calculate cursor Y relative to iframe
+    var frame = document.getElementById('previewFrame');
+    var frameRect = frame.getBoundingClientRect();
+    var relY = e.clientY - frameRect.top;
+    if (frame.contentWindow) {
+      frame.contentWindow.postMessage({ type: 'drag-position', y: relY }, '*');
+    }
   }
 });
 previewArea.addEventListener('dragleave', function(e) {
-  if (!previewArea.contains(e.relatedTarget)) canvasOverlay.style.display = 'none';
+  if (!previewArea.contains(e.relatedTarget)) {
+    canvasOverlay.style.display = 'none';
+    var frame = document.getElementById('previewFrame');
+    if (frame.contentWindow) frame.contentWindow.postMessage({ type: 'drag-leave' }, '*');
+  }
 });
 previewArea.addEventListener('drop', function(e) {
   e.preventDefault();
   canvasOverlay.style.display = 'none';
+  var frame = document.getElementById('previewFrame');
+  if (frame.contentWindow) frame.contentWindow.postMessage({ type: 'drag-leave' }, '*');
   var blockType = e.dataTransfer.getData('block-type');
   if (blockType && blockLabels[blockType]) {
+    // Use the position from iframe if available, otherwise append
+    var pos = canvasDropPosition >= 0 ? canvasDropPosition : sections.length;
     pushHistory();
-    sections.push(blockType);
-    selectedIdx = sections.length - 1;
+    sections.splice(pos, 0, blockType);
+    selectedIdx = pos;
+    canvasDropPosition = -1;
     renderSectionList();
     renderContentPanel();
     renderStylePanel();
@@ -1180,9 +1349,227 @@ function discardDraft() {
 setInterval(function() { if (sections.length > 0) saveDraft(); }, 60000);
 
 // ═══════════════════════════════════════════════════════
+// STYLE INSPIRATION / REFERENCE SITES
+// ═══════════════════════════════════════════════════════
+var referenceSites = [];
+var blendedTokens = null;
+var refPollTimer = null;
+
+function loadReferenceSites() {
+  fetch('/admin/references').then(function(r) { return r.json(); })
+  .then(function(sites) {
+    referenceSites = sites;
+    renderReferenceSites();
+    // If any are still analyzing, poll
+    if (sites.some(function(s) { return s.status === 'analyzing'; })) {
+      clearTimeout(refPollTimer);
+      refPollTimer = setTimeout(loadReferenceSites, 3000);
+    }
+    // Auto-load blend if any are ready
+    if (sites.some(function(s) { return s.status === 'ready' && s.influence > 0; })) {
+      loadBlendedTokens();
+    }
+  }).catch(function() {});
+}
+
+function renderReferenceSites() {
+  var list = document.getElementById('refSitesList');
+  if (!referenceSites.length) {
+    list.innerHTML = '<div class="le-inspo-empty"><p class="muted">No reference sites yet. Add a URL above.</p></div>';
+    document.getElementById('refBlendPreview').style.display = 'none';
+    document.getElementById('applyBlendBtn').style.display = 'none';
+    return;
+  }
+
+  var html = '';
+  referenceSites.forEach(function(site) {
+    var tokens = site.designTokens;
+    var statusBadge = '';
+    if (site.status === 'analyzing') statusBadge = '<span class="badge badge--warning">Analyzing...</span>';
+    else if (site.status === 'error') statusBadge = '<span class="badge badge--danger">Error</span>';
+    else if (site.status === 'ready') statusBadge = '<span class="badge badge--success">Ready</span>';
+
+    html += '<div class="le-inspo-site" data-id="' + site.id + '">';
+    html += '<div class="le-inspo-site-header">';
+    html += '<div class="le-inspo-site-info">';
+    html += '<strong class="le-inspo-site-name">' + (site.name || 'Unknown') + '</strong>';
+    html += '<span class="le-inspo-site-url muted">' + site.url.substring(0, 40) + '</span>';
+    html += '</div>';
+    html += statusBadge;
+    html += '<button class="le-inspo-delete" onclick="deleteReferenceSite(\'' + site.id + '\')" title="Remove">&times;</button>';
+    html += '</div>';
+
+    // Color swatches if ready
+    if (tokens && tokens.colors) {
+      html += '<div class="le-inspo-swatches">';
+      Object.keys(tokens.colors).forEach(function(key) {
+        html += '<div class="le-inspo-swatch" style="background:' + tokens.colors[key] + '" title="' + key + ': ' + tokens.colors[key] + '"></div>';
+      });
+      html += '</div>';
+      html += '<div class="le-inspo-fonts muted">' + (tokens.typography ? tokens.typography.headingFont + ' / ' + tokens.typography.bodyFont : '') + '</div>';
+    }
+
+    // Influence slider
+    html += '<div class="le-inspo-slider-row">';
+    html += '<label class="le-inspo-slider-label">Influence</label>';
+    html += '<input type="range" class="le-inspo-slider" min="0" max="100" value="' + site.influence + '" ' +
+      'oninput="this.nextElementSibling.textContent=this.value+\'%\'" ' +
+      'onchange="updateInfluence(\'' + site.id + '\',parseInt(this.value))"' +
+      (site.status !== 'ready' ? ' disabled' : '') + '>';
+    html += '<span class="le-inspo-slider-val">' + site.influence + '%</span>';
+    html += '</div>';
+    html += '</div>';
+  });
+
+  list.innerHTML = html;
+}
+
+function addReferenceSite() {
+  var input = document.getElementById('refUrlInput');
+  var url = input.value.trim();
+  if (!url) return;
+
+  // Basic URL validation
+  try { new URL(url); } catch(e) {
+    showToast('Please enter a valid URL', 'error');
+    return;
+  }
+
+  input.value = '';
+  fetch('/admin/references', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url: url })
+  }).then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.error) { showToast(data.error, 'error'); return; }
+    showToast('Analyzing ' + (data.name || url) + '...', 'success');
+    loadReferenceSites();
+  }).catch(function() { showToast('Failed to add site', 'error'); });
+}
+
+function updateInfluence(id, value) {
+  fetch('/admin/references/' + id, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ influence: value })
+  }).then(function(r) { return r.json(); })
+  .then(function() {
+    // Update local state
+    referenceSites.forEach(function(s) { if (s.id === id) s.influence = value; });
+    loadBlendedTokens();
+  });
+}
+
+function deleteReferenceSite(id) {
+  if (!confirm('Remove this reference site?')) return;
+  fetch('/admin/references/' + id, { method: 'DELETE' })
+  .then(function() {
+    referenceSites = referenceSites.filter(function(s) { return s.id !== id; });
+    renderReferenceSites();
+    loadBlendedTokens();
+  });
+}
+
+var autoApplyBlend = true;
+
+function loadBlendedTokens() {
+  fetch('/admin/references/blend').then(function(r) { return r.json(); })
+  .then(function(data) {
+    blendedTokens = data.tokens;
+    renderBlendPreview();
+    if (autoApplyBlend && blendedTokens) {
+      applyBlendedStyles();
+    }
+  });
+}
+
+function renderBlendPreview() {
+  var container = document.getElementById('refBlendPreview');
+  var applyBtn = document.getElementById('applyBlendBtn');
+  if (!blendedTokens) {
+    container.style.display = 'none';
+    applyBtn.style.display = 'none';
+    return;
+  }
+  container.style.display = '';
+  applyBtn.style.display = '';
+
+  // Render color swatches
+  var colorsHtml = '';
+  if (blendedTokens.colors) {
+    Object.keys(blendedTokens.colors).forEach(function(key) {
+      colorsHtml += '<div class="le-inspo-swatch-labeled">';
+      colorsHtml += '<div class="le-inspo-swatch" style="background:' + blendedTokens.colors[key] + '"></div>';
+      colorsHtml += '<span class="le-inspo-swatch-name">' + key + '</span>';
+      colorsHtml += '</div>';
+    });
+  }
+  document.getElementById('refBlendColors').innerHTML = colorsHtml;
+
+  // Render typography info
+  var typoHtml = '';
+  if (blendedTokens.typography) {
+    typoHtml = '<span>Heading: ' + blendedTokens.typography.headingFont + '</span>';
+    typoHtml += '<span>Body: ' + blendedTokens.typography.bodyFont + '</span>';
+    typoHtml += '<span>Aesthetic: ' + (blendedTokens.style ? blendedTokens.style.aesthetic : 'N/A') + '</span>';
+  }
+  document.getElementById('refBlendTypo').innerHTML = typoHtml;
+}
+
+function applyBlendedStyles() {
+  if (!blendedTokens) return;
+  pushHistory();
+
+  // Map blended tokens to shadow style string
+  var shadowMap = {
+    'none': 'none',
+    'subtle': '0 1px 3px rgba(0,0,0,0.1)',
+    'medium': '0 4px 12px rgba(0,0,0,0.15)',
+    'dramatic': '0 8px 30px rgba(0,0,0,0.25)'
+  };
+
+  // Apply to all sections
+  sections.forEach(function(s, idx) {
+    var vk = getVisKey(s, idx);
+    if (!sectionStyles[vk]) sectionStyles[vk] = {};
+    var st = sectionStyles[vk];
+
+    if (blendedTokens.colors) {
+      st.bgColor = blendedTokens.colors.background;
+      st.textColor = blendedTokens.colors.text;
+    }
+    if (blendedTokens.typography) {
+      st.fontFamily = blendedTokens.typography.bodyFont;
+      if (blendedTokens.typography.baseSize) st.fontSize = parseFloat(blendedTokens.typography.baseSize);
+      if (blendedTokens.typography.lineHeight) st.lineHeight = blendedTokens.typography.lineHeight;
+      if (blendedTokens.typography.letterSpacing) st.letterSpacing = parseFloat(blendedTokens.typography.letterSpacing);
+    }
+    if (blendedTokens.spacing) {
+      if (blendedTokens.spacing.sectionPadding) {
+        var pad = parseFloat(blendedTokens.spacing.sectionPadding);
+        st.paddingTop = pad;
+        st.paddingBottom = pad;
+      }
+    }
+    if (blendedTokens.style) {
+      if (blendedTokens.style.borderRadius) st.borderRadius = parseFloat(blendedTokens.style.borderRadius);
+      if (blendedTokens.style.shadowStyle && shadowMap[blendedTokens.style.shadowStyle]) {
+        st.boxShadow = shadowMap[blendedTokens.style.shadowStyle];
+      }
+    }
+  });
+
+  renderStylePanel();
+  refreshPreview();
+  showToast('Blended styles applied!', 'success');
+}
+
+// ═══════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════
 buildPickerList();
 renderSectionList();
 refreshPreview();
+loadReferenceSites();
 </script>
